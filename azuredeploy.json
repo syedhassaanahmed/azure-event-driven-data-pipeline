@@ -1,0 +1,180 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ingressFunctionName": {
+            "type": "string",
+            "defaultValue": "ingress-func",
+            "metadata": {
+                "description": "Name of the ingress function app."
+            }
+        },
+        "ingressSku": {
+            "type": "string",
+            "allowedValues": [
+                "Free",
+                "Shared",
+                "Basic",
+                "Standard"
+            ],
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "Pricing tier for dedicated plan."
+            }
+        },
+        "ingressWorkerSize": {
+            "type": "string",
+            "allowedValues": [
+                "0",
+                "1",
+                "2"
+            ],
+            "defaultValue": "0",
+            "metadata": {
+                "description": "Instance size of the dedicated plan (small, medium, or large)."
+            }
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_RAGRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type"
+            }
+        }
+    },
+    "variables": {
+        "ingressConsumptionPlan": "[concat(parameters('ingressFunctionName'), '-consumption')]",
+        "ingressDedicatedPlan": "[concat(parameters('ingressFunctionName'), '-dedicated')]",
+        "storageAccountName": "azfunctions",
+        "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "appInsightsServiceName": "azfunctions"
+    },
+    "resources": [
+        {
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('storageAccountType')]"
+            }
+        },
+        {
+            "name": "[variables('appInsightsServiceName')]",
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "kind": "other",
+            "properties": {
+                "ApplicationId": "[variables('appInsightsServiceName')]"
+            }
+        },
+        {
+            "name": "[variables('ingressConsumptionPlan')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2015-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[variables('ingressConsumptionPlan')]",
+                "computeMode": "Dynamic",
+                "sku": "Dynamic"
+            }
+        },
+        {
+            "name": "[variables('ingressConsumptionPlan')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('ingressConsumptionPlan'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressConsumptionPlan'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~1"
+                        },
+                        {
+                            "name": "AppInsights_InstrumentationKey",
+                            "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsServiceName'))).InstrumentationKey]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[variables('ingressDedicatedPlan')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2015-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[variables('ingressDedicatedPlan')]",
+                "sku": "[parameters('ingressSku')]",
+                "workerSize": "[parameters('ingressWorkerSize')]",
+                "hostingEnvironment": "",
+                "numberOfWorkers": 1
+            }
+        },
+        {
+            "name": "[variables('ingressDedicatedPlan')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('ingressDedicatedPlan'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
+            ],
+            "properties": {
+                "name": "[variables('ingressDedicatedPlan')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressDedicatedPlan'))]",
+                "hostingEnvironment": "",
+                "clientAffinityEnabled": false,
+                "siteConfig": {
+                    "alwaysOn": true,
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~1"
+                        },
+                        {
+                            "name": "AppInsights_InstrumentationKey",
+                            "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsServiceName'))).InstrumentationKey]"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
