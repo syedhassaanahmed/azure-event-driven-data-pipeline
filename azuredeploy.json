@@ -48,6 +48,7 @@
         }
     },
     "variables": {
+        "repoURL": "https://github.com/syedhassaanahmed/azure-event-driven-data-pipeline.git",
         "ingressConsumptionPlan": "[concat(parameters('ingressFunctionName'), '-consumption')]",
         "ingressDedicatedPlan": "[concat(parameters('ingressFunctionName'), '-dedicated')]",
         "storageAccountName": "azfunctions",
@@ -70,6 +71,7 @@
             "type": "microsoft.insights/components",
             "apiVersion": "2015-05-01",
             "kind": "other",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "ApplicationId": "[variables('appInsightsServiceName')]"
             }
@@ -96,6 +98,19 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
             ],
+            "resources": [{
+                "apiVersion": "2016-03-01",
+                "name": "web",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Web/Sites', variables('ingressConsumptionPlan'))]"
+                ],
+                "properties": {
+                    "RepoUrl": "[variables('repoURL')]",
+                    "branch": "master",
+                    "IsManualIntegration": true
+                }
+            }],
             "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressConsumptionPlan'))]",
                 "siteConfig": {
@@ -148,6 +163,19 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
             ],
+            "resources": [{
+                "apiVersion": "2016-03-01",
+                "name": "web",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Web/Sites', variables('ingressDedicatedPlan'))]"
+                ],
+                "properties": {
+                    "RepoUrl": "[variables('repoURL')]",
+                    "branch": "master",
+                    "IsManualIntegration": true
+                }
+            }],
             "properties": {
                 "name": "[variables('ingressDedicatedPlan')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressDedicatedPlan'))]",
