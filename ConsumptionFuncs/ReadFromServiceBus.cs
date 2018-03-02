@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
-namespace CosmosDbFunc
+namespace ConsumptionFuncs
 {
     public static class ReadFromServiceBus
     {

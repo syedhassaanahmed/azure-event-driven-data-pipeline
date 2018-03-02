@@ -40,11 +40,11 @@
             "maxValue": 20,
             "defaultValue": 4
         },
-        "cosmosDBFunctionName": {
+        "consumptionFunctionName": {
             "type": "string",
-            "defaultValue": "cosmos-db-func",
+            "defaultValue": "consumption-func",
             "metadata": {
-                "description": "Name of the Function App which operates on Cosmos DB"
+                "description": "Name of the Function App which operates on consumption plan"
             }
         },
         "databaseAccountName": {
@@ -138,13 +138,13 @@
             }
         },
         {
-            "name": "[parameters('cosmosDBFunctionName')]",
+            "name": "[parameters('consumptionFunctionName')]",
             "type": "microsoft.insights/components",
             "apiVersion": "2015-05-01",
             "kind": "other",
             "location": "[resourceGroup().location]",
             "properties": {
-                "ApplicationId": "[parameters('cosmosDBFunctionName')]"
+                "ApplicationId": "[parameters('consumptionFunctionName')]"
             }
         },
         {
@@ -224,27 +224,27 @@
             }
         },
         {
-            "name": "[parameters('cosmosDBFunctionName')]",
+            "name": "[parameters('consumptionFunctionName')]",
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2015-04-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "name": "[parameters('cosmosDBFunctionName')]",
+                "name": "[parameters('consumptionFunctionName')]",
                 "computeMode": "Dynamic",
                 "sku": "Dynamic"
             }
         },
         {
-            "name": "[parameters('cosmosDBFunctionName')]",
+            "name": "[parameters('consumptionFunctionName')]",
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDBFunctionName'))]",
+                "[resourceId('Microsoft.Web/serverfarms', parameters('consumptionFunctionName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[concat('Microsoft.DocumentDb/databaseAccounts/', parameters('databaseAccountName'))]",
-                "[resourceId('microsoft.insights/components', parameters('cosmosDBFunctionName'))]"
+                "[resourceId('microsoft.insights/components', parameters('consumptionFunctionName'))]"
             ],
             "resources": [
                 {
@@ -252,7 +252,7 @@
                     "name": "web",
                     "type": "sourcecontrols",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', parameters('cosmosDBFunctionName'))]"
+                        "[resourceId('Microsoft.Web/Sites', parameters('consumptionFunctionName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "[variables('repoURL')]",
@@ -262,7 +262,7 @@
                 }
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDBFunctionName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumptionFunctionName'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
@@ -283,11 +283,11 @@
                         },
                         {
                             "name": "AppInsights_InstrumentationKey",
-                            "value": "[reference(concat('microsoft.insights/components/', parameters('cosmosDBFunctionName'))).InstrumentationKey]"
+                            "value": "[reference(concat('microsoft.insights/components/', parameters('consumptionFunctionName'))).InstrumentationKey]"
                         },
                         {
                             "name": "PROJECT",
-                            "value": "CosmosDbFunc/CosmosDbFunc.csproj"
+                            "value": "ConsumptionFuncs/ConsumptionFuncs.csproj"
                         },
                         {
                             "name": "SERVICEBUS_CONNECTION",
