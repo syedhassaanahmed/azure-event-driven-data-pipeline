@@ -300,6 +300,10 @@
                         {
                             "name": "COSMOSDB_KEY",
                             "Value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccountName')), '2016-03-31').primaryMasterKey]"
+                        },
+                        {
+                            "name": "SCM_COMMAND_IDLE_TIMEOUT",
+                            "value": "600"
                         }
                     ]
                 }
