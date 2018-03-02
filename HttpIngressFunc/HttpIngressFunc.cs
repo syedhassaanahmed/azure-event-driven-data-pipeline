@@ -2,7 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.ServiceBus.Messaging;
 
-namespace HttpIngressFunc
+namespace Functions
 {
     public static class HttpIngressFunc
     {
