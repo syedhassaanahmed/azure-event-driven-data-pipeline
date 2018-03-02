@@ -4,7 +4,7 @@
     "parameters": {
         "ingressFunctionName": {
             "type": "string",
-            "defaultValue": "ingress-func",
+            "defaultValue": "http-ingress-func",
             "metadata": {
                 "description": "Name of the ingress function app."
             }
@@ -134,6 +134,10 @@
                         {
                             "name": "AppInsights_InstrumentationKey",
                             "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsServiceName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "PROJECT",
+                            "value": "HttpIngressFunc"
                         }
                     ]
                 }
@@ -199,6 +203,10 @@
                         {
                             "name": "AppInsights_InstrumentationKey",
                             "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsServiceName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "PROJECT",
+                            "value": "HttpIngressFunc"
                         }
                     ]
                 }
