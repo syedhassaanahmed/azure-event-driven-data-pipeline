@@ -29,10 +29,16 @@
                 "1",
                 "2"
             ],
-            "defaultValue": "0",
+            "defaultValue": "2",
             "metadata": {
                 "description": "Instance size of the dedicated plan (small, medium, or large)."
             }
+        },
+        "ingressNumberOfWorkers": {
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 20,
+            "defaultValue": "4"
         },
         "storageAccountType": {
             "type": "string",
@@ -45,6 +51,13 @@
             "metadata": {
                 "description": "Storage Account type"
             }
+        },
+        "serviceBusNamespaceName": {
+            "type": "string",
+            "defaultValue": "productsNamespace",
+            "metadata": {
+                "description": "Name of the Service Bus namespace"
+            }
         }
     },
     "variables": {
@@ -53,6 +66,8 @@
         "ingressDedicatedPlan": "[concat(parameters('ingressFunctionName'), '-dedicated')]",
         "storageAccountName": "azfunctions",
         "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "serviceBusQueueName": "productsQueue",
+        "authRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespaceName'), 'RootManageSharedAccessKey')]",
         "appInsightsServiceName": "azfunctions"
     },
     "resources": [
@@ -65,6 +80,30 @@
             "sku": {
                 "name": "[parameters('storageAccountType')]"
             }
+        },
+        {
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('serviceBusNamespaceName')]",
+            "type": "Microsoft.ServiceBus/Namespaces",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {},
+            "resources": [
+                {
+                    "apiVersion": "2017-04-01",
+                    "name": "[variables('serviceBusQueueName')]",
+                    "type": "Queues",
+                    "dependsOn": [
+                        "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]"
+                    ],
+                    "properties": {
+                        "enablePartitioning": "true",
+                        "enableExpress": "true"
+                    }
+                }
+            ]
         },
         {
             "name": "[variables('appInsightsServiceName')]",
@@ -96,21 +135,24 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('ingressConsumptionPlan'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]",
                 "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
             ],
-            "resources": [{
-                "apiVersion": "2016-03-01",
-                "name": "web",
-                "type": "sourcecontrols",
-                "dependsOn": [
-                    "[resourceId('Microsoft.Web/Sites', variables('ingressConsumptionPlan'))]"
-                ],
-                "properties": {
-                    "RepoUrl": "[variables('repoURL')]",
-                    "branch": "master",
-                    "IsManualIntegration": true
+            "resources": [
+                {
+                    "apiVersion": "2016-03-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', variables('ingressConsumptionPlan'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[variables('repoURL')]",
+                        "branch": "master",
+                        "IsManualIntegration": true
+                    }
                 }
-            }],
+            ],
             "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressConsumptionPlan'))]",
                 "siteConfig": {
@@ -137,7 +179,11 @@
                         },
                         {
                             "name": "PROJECT",
-                            "value": "HttpIngressFunc"
+                            "value": "HttpIngressFunc/HttpIngressFunc.csproj"
+                        },
+                        {
+                            "name": "SERVICEBUS_CONNECTION",
+                            "value": "[listkeys(variables('authRuleResourceId'), '2017-04-01').primaryConnectionString]"
                         }
                     ]
                 }
@@ -153,7 +199,7 @@
                 "sku": "[parameters('ingressSku')]",
                 "workerSize": "[parameters('ingressWorkerSize')]",
                 "hostingEnvironment": "",
-                "numberOfWorkers": 1
+                "numberOfWorkers": "[parameters('ingressNumberOfWorkers')]"
             }
         },
         {
@@ -165,21 +211,24 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('ingressDedicatedPlan'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]",
                 "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
             ],
-            "resources": [{
-                "apiVersion": "2016-03-01",
-                "name": "web",
-                "type": "sourcecontrols",
-                "dependsOn": [
-                    "[resourceId('Microsoft.Web/Sites', variables('ingressDedicatedPlan'))]"
-                ],
-                "properties": {
-                    "RepoUrl": "[variables('repoURL')]",
-                    "branch": "master",
-                    "IsManualIntegration": true
+            "resources": [
+                {
+                    "apiVersion": "2016-03-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', variables('ingressDedicatedPlan'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[variables('repoURL')]",
+                        "branch": "master",
+                        "IsManualIntegration": true
+                    }
                 }
-            }],
+            ],
             "properties": {
                 "name": "[variables('ingressDedicatedPlan')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressDedicatedPlan'))]",
@@ -206,7 +255,11 @@
                         },
                         {
                             "name": "PROJECT",
-                            "value": "HttpIngressFunc"
+                            "value": "HttpIngressFunc/HttpIngressFunc.csproj"
+                        },
+                        {
+                            "name": "SERVICEBUS_CONNECTION",
+                            "value": "[listkeys(variables('authRuleResourceId'), '2017-04-01').primaryConnectionString]"
                         }
                     ]
                 }
