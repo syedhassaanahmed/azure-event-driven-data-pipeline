@@ -38,7 +38,7 @@
             "type": "int",
             "minValue": 1,
             "maxValue": 20,
-            "defaultValue": "4"
+            "defaultValue": 4
         },
         "storageAccountType": {
             "type": "string",
@@ -54,7 +54,7 @@
         },
         "serviceBusNamespaceName": {
             "type": "string",
-            "defaultValue": "productsNamespace",
+            "defaultValue": "azure-meetup-products",
             "metadata": {
                 "description": "Name of the Service Bus namespace"
             }
