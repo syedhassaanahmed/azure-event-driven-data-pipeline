@@ -40,6 +40,20 @@
             "maxValue": 20,
             "defaultValue": 4
         },
+        "cosmosDBFunctionName": {
+            "type": "string",
+            "defaultValue": "cosmos-db-func",
+            "metadata": {
+                "description": "Name of the Function App which operates on Cosmos DB"
+            }
+        },
+        "databaseAccountName": {
+            "type": "string",
+            "defaultValue": "azure-meetup-cosmosdb",
+            "metadata": {
+                "description": "Name of the Cosmos DB account"
+            }
+        },
         "storageAccountType": {
             "type": "string",
             "defaultValue": "Standard_LRS",
@@ -62,15 +76,23 @@
     },
     "variables": {
         "repoURL": "https://github.com/syedhassaanahmed/azure-event-driven-data-pipeline.git",
-        "ingressConsumptionPlan": "[concat(parameters('ingressFunctionName'), '-consumption')]",
-        "ingressDedicatedPlan": "[concat(parameters('ingressFunctionName'), '-dedicated')]",
         "storageAccountName": "azfunctions",
         "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
         "serviceBusQueueName": "productsQueue",
-        "authRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespaceName'), 'RootManageSharedAccessKey')]",
-        "appInsightsServiceName": "azfunctions"
+        "authRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespaceName'), 'RootManageSharedAccessKey')]"
     },
     "resources": [
+        {
+            "name": "[parameters('databaseAccountName')]",
+            "type": "Microsoft.DocumentDb/databaseAccounts",
+            "apiVersion": "2016-03-31",
+            "kind": "GlobalDocumentDB",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[parameters('databaseAccountName')]",
+                "databaseAccountOfferType": "Standard"
+            }
+        },
         {
             "name": "[variables('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
@@ -106,37 +128,49 @@
             ]
         },
         {
-            "name": "[variables('appInsightsServiceName')]",
+            "name": "[parameters('ingressFunctionName')]",
             "type": "microsoft.insights/components",
             "apiVersion": "2015-05-01",
             "kind": "other",
             "location": "[resourceGroup().location]",
             "properties": {
-                "ApplicationId": "[variables('appInsightsServiceName')]"
+                "ApplicationId": "[parameters('ingressFunctionName')]"
             }
         },
         {
-            "name": "[variables('ingressConsumptionPlan')]",
+            "name": "[parameters('cosmosDBFunctionName')]",
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "kind": "other",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ApplicationId": "[parameters('cosmosDBFunctionName')]"
+            }
+        },
+        {
+            "name": "[parameters('ingressFunctionName')]",
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2015-04-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "name": "[variables('ingressConsumptionPlan')]",
-                "computeMode": "Dynamic",
-                "sku": "Dynamic"
+                "name": "[parameters('ingressFunctionName')]",
+                "sku": "[parameters('ingressSku')]",
+                "workerSize": "[parameters('ingressWorkerSize')]",
+                "hostingEnvironment": "",
+                "numberOfWorkers": "[parameters('ingressNumberOfWorkers')]"
             }
         },
         {
-            "name": "[variables('ingressConsumptionPlan')]",
+            "name": "[parameters('ingressFunctionName')]",
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('ingressConsumptionPlan'))]",
+                "[resourceId('Microsoft.Web/serverfarms', parameters('ingressFunctionName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]",
-                "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
+                "[resourceId('microsoft.insights/components', parameters('ingressFunctionName'))]"
             ],
             "resources": [
                 {
@@ -144,7 +178,7 @@
                     "name": "web",
                     "type": "sourcecontrols",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('ingressConsumptionPlan'))]"
+                        "[resourceId('Microsoft.Web/Sites', parameters('ingressFunctionName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "[variables('repoURL')]",
@@ -154,7 +188,81 @@
                 }
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressConsumptionPlan'))]",
+                "name": "[parameters('ingressFunctionName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('ingressFunctionName'))]",
+                "hostingEnvironment": "",
+                "clientAffinityEnabled": false,
+                "siteConfig": {
+                    "alwaysOn": true,
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~1"
+                        },
+                        {
+                            "name": "AppInsights_InstrumentationKey",
+                            "value": "[reference(concat('microsoft.insights/components/', parameters('ingressFunctionName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "PROJECT",
+                            "value": "HttpIngressFunc/HttpIngressFunc.csproj"
+                        },
+                        {
+                            "name": "SERVICEBUS_CONNECTION",
+                            "value": "[listkeys(variables('authRuleResourceId'), '2017-04-01').primaryConnectionString]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[parameters('cosmosDBFunctionName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2015-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[parameters('cosmosDBFunctionName')]",
+                "computeMode": "Dynamic",
+                "sku": "Dynamic"
+            }
+        },
+        {
+            "name": "[parameters('cosmosDBFunctionName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDBFunctionName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[concat('Microsoft.DocumentDb/databaseAccounts/', parameters('databaseAccountName'))]",
+                "[resourceId('microsoft.insights/components', parameters('cosmosDBFunctionName'))]"
+            ],
+            "resources": [
+                {
+                    "apiVersion": "2016-03-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('cosmosDBFunctionName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[variables('repoURL')]",
+                        "branch": "master",
+                        "IsManualIntegration": true
+                    }
+                }
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDBFunctionName'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
@@ -175,91 +283,23 @@
                         },
                         {
                             "name": "AppInsights_InstrumentationKey",
-                            "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsServiceName'))).InstrumentationKey]"
+                            "value": "[reference(concat('microsoft.insights/components/', parameters('cosmosDBFunctionName'))).InstrumentationKey]"
                         },
                         {
                             "name": "PROJECT",
-                            "value": "HttpIngressFunc/HttpIngressFunc.csproj"
+                            "value": "CosmosDbFunc/CosmosDbFunc.csproj"
                         },
                         {
                             "name": "SERVICEBUS_CONNECTION",
                             "value": "[listkeys(variables('authRuleResourceId'), '2017-04-01').primaryConnectionString]"
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "name": "[variables('ingressDedicatedPlan')]",
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2015-04-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "name": "[variables('ingressDedicatedPlan')]",
-                "sku": "[parameters('ingressSku')]",
-                "workerSize": "[parameters('ingressWorkerSize')]",
-                "hostingEnvironment": "",
-                "numberOfWorkers": "[parameters('ingressNumberOfWorkers')]"
-            }
-        },
-        {
-            "name": "[variables('ingressDedicatedPlan')]",
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2016-08-01",
-            "location": "[resourceGroup().location]",
-            "kind": "functionapp",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('ingressDedicatedPlan'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-                "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]",
-                "[resourceId('microsoft.insights/components', variables('appInsightsServiceName'))]"
-            ],
-            "resources": [
-                {
-                    "apiVersion": "2016-03-01",
-                    "name": "web",
-                    "type": "sourcecontrols",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('ingressDedicatedPlan'))]"
-                    ],
-                    "properties": {
-                        "RepoUrl": "[variables('repoURL')]",
-                        "branch": "master",
-                        "IsManualIntegration": true
-                    }
-                }
-            ],
-            "properties": {
-                "name": "[variables('ingressDedicatedPlan')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('ingressDedicatedPlan'))]",
-                "hostingEnvironment": "",
-                "clientAffinityEnabled": false,
-                "siteConfig": {
-                    "alwaysOn": true,
-                    "appSettings": [
-                        {
-                            "name": "AzureWebJobsDashboard",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
                         },
                         {
-                            "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+                            "name": "COSMOSDB_ENDPOINT",
+                            "Value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('databaseAccountName'))).documentEndpoint]"
                         },
                         {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~1"
-                        },
-                        {
-                            "name": "AppInsights_InstrumentationKey",
-                            "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsServiceName'))).InstrumentationKey]"
-                        },
-                        {
-                            "name": "PROJECT",
-                            "value": "HttpIngressFunc/HttpIngressFunc.csproj"
-                        },
-                        {
-                            "name": "SERVICEBUS_CONNECTION",
-                            "value": "[listkeys(variables('authRuleResourceId'), '2017-04-01').primaryConnectionString]"
+                            "name": "COSMOSDB_KEY",
+                            "Value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccountName')), '2016-03-31').primaryMasterKey]"
                         }
                     ]
                 }
