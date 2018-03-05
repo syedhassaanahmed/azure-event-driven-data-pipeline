@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Newtonsoft.Json.Linq;
 
 namespace ConsumptionFuncs
 {
@@ -13,12 +13,13 @@ namespace ConsumptionFuncs
             collectionName: "product",
             CreateLeaseCollectionIfNotExists = true,
             ConnectionStringSetting = "COSMOSDB_CONNECTION",
-            LeaseCollectionName = "leases")]IReadOnlyList<Document> input, TraceWriter log)
+            LeaseCollectionName = "leases")]JArray input, TraceWriter log)
         {
             if (input != null && input.Count > 0)
             {
                 log.Verbose("Documents modified " + input.Count);
-                log.Verbose("First document Id " + input[0].Id);
+                var firstDocument = input[0].ToObject<Document>();
+                log.Verbose("First document Id " + firstDocument.Id);
             }
         }
     }
