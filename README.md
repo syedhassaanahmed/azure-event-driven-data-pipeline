@@ -9,7 +9,7 @@ We perform the load tests using [Azure Container Instances](https://docs.microso
 ./generate-load.sh azure-meetup loadgen-container https://http-ingress-func.azurewebsites.net/api/HttpIngressFunc?code=<FUNCTION_KEY>
 ```
 
-Hwre is how to stream logs from the container;
+Here is how to stream logs from the container;
 ```
 az container attach -g azure-meetup -n loadgen-container
 ```
