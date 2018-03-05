@@ -1,0 +1,21 @@
+{
+    "indexingMode": "consistent",
+    "automatic": true,
+    "excludedPaths": [
+        {
+            "path": "/"
+        }
+    ],
+    "includedPaths": [
+        {
+            "path": "/productGroupId/?",
+            "indexes": [
+                {
+                    "kind": "Hash",
+                    "dataType": "String",
+                    "precision": -1
+                }
+            ]
+        }
+    ]
+}
