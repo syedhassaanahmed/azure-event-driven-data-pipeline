@@ -29,7 +29,7 @@
                 "1",
                 "2"
             ],
-            "defaultValue": "2",
+            "defaultValue": "1",
             "metadata": {
                 "description": "Instance size of the dedicated plan (small, medium, or large)."
             }
@@ -38,7 +38,7 @@
             "type": "int",
             "minValue": 1,
             "maxValue": 20,
-            "defaultValue": 4
+            "defaultValue": 10
         },
         "consumptionFunctionName": {
             "type": "string",
@@ -121,7 +121,10 @@
                         "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]"
                     ],
                     "properties": {
-                        "enablePartitioning": "true"
+                        "requiresDuplicateDetection": "false",
+                        "requiresSession": "false",
+                        "enablePartitioning": "true",
+                        "enableExpress": "true"
                     }
                 }
             ]

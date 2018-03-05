@@ -10,12 +10,13 @@ az container delete -g $RESOURCE_GROUP --name $CONTAINER_NAME -y
 DB_NAME=masterdata
 COLLECTION_NAME=product
 COSMOS_DB=$(az cosmosdb list -g $RESOURCE_GROUP --query "[0].name" -o tsv)
+az cosmosdb database create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME
 az cosmosdb collection delete -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $COLLECTION_NAME
 az cosmosdb collection create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $COLLECTION_NAME \
     --indexing-policy @indexing-policy.json --throughput 25000 --partition-key-path "/productGroupId"
 
 SCRIPT_URL=https://raw.githubusercontent.com/syedhassaanahmed/azure-event-driven-data-pipeline/master/load-test/products.lua
-WRK_OPTIONS="-t1 -c100 -d5m -R1500 --latency"
+WRK_OPTIONS="-t1 -c100 -d2m -R1500 --latency"
 WRK_IMAGE=syedhassaanahmed/wrk2-with-online-script
 
 az container create -g $RESOURCE_GROUP --name $CONTAINER_NAME --image $WRK_IMAGE \
