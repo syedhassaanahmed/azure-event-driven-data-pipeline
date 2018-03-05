@@ -47,7 +47,7 @@
                 "description": "Name of the Function App which operates on consumption plan"
             }
         },
-        "databaseAccountName": {
+        "cosmosDbAccountName": {
             "type": "string",
             "defaultValue": "azure-meetup-cosmosdb",
             "metadata": {
@@ -78,18 +78,19 @@
         "repoURL": "https://github.com/syedhassaanahmed/azure-event-driven-data-pipeline.git",
         "storageAccountName": "azfunctions",
         "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+        "cosmosDbId": "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]",
         "serviceBusQueueName": "productsQueue",
         "authRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespaceName'), 'RootManageSharedAccessKey')]"
     },
     "resources": [
         {
-            "name": "[parameters('databaseAccountName')]",
+            "name": "[parameters('cosmosDbAccountName')]",
             "type": "Microsoft.DocumentDb/databaseAccounts",
             "apiVersion": "2016-03-31",
             "kind": "GlobalDocumentDB",
             "location": "[resourceGroup().location]",
             "properties": {
-                "name": "[parameters('databaseAccountName')]",
+                "name": "[parameters('cosmosDbAccountName')]",
                 "databaseAccountOfferType": "Standard"
             }
         },
@@ -245,7 +246,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('consumptionFunctionName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-                "[concat('Microsoft.DocumentDb/databaseAccounts/', parameters('databaseAccountName'))]",
+                "[concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))]",
                 "[resourceId('microsoft.insights/components', parameters('consumptionFunctionName'))]"
             ],
             "resources": [
@@ -297,11 +298,15 @@
                         },
                         {
                             "name": "COSMOSDB_ENDPOINT",
-                            "Value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('databaseAccountName'))).documentEndpoint]"
+                            "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))).documentEndpoint]"
                         },
                         {
                             "name": "COSMOSDB_KEY",
-                            "Value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccountName')), '2016-03-31').primaryMasterKey]"
+                            "value": "[listKeys(variables('cosmosDbId'), '2016-03-31').primaryMasterKey]"
+                        },
+                        {
+                            "name": "COSMOSDB_CONNECTION",
+                            "value": "[concat('AccountEndpoint=https://', parameters('cosmosDbAccountName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('cosmosDbId'), '2016-03-31').primaryMasterKey, ';')]"
                         },
                         {
                             "name": "SCM_COMMAND_IDLE_TIMEOUT",

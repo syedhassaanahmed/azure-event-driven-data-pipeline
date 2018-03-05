@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpIngressFunc", "HttpIngressFunc\HttpIngressFunc.csproj", "{FFB52DEA-E607-43F3-ABE6-2F19909402A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsumptionFuncs", "ConsumptionFuncs\ConsumptionFuncs.csproj", "{3C5C9125-4BA5-4103-B8F2-5C33D209EA2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsumptionFuncs", "ConsumptionFuncs\ConsumptionFuncs.csproj", "{3C5C9125-4BA5-4103-B8F2-5C33D209EA2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
