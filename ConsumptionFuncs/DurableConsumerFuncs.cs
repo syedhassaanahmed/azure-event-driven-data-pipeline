@@ -16,8 +16,8 @@ namespace ConsumptionFuncs
 
     public static class DurableConsumerFuncs
     {
-        [FunctionName(nameof(ConsumerOrchestrator))]
-        public static async Task ConsumerOrchestrator([OrchestrationTrigger] DurableOrchestrationContext ctx)
+        [FunctionName(nameof(OrchestrateConsumersAsync))]
+        public static async Task OrchestrateConsumersAsync([OrchestrationTrigger] DurableOrchestrationContext ctx)
         {
             var changedProducts = ctx.GetInput<List<Document>>();
 

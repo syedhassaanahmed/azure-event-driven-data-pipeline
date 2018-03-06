@@ -17,7 +17,7 @@ namespace ConsumptionFuncs
         {
             if (input != null && input.Count > 0)
             {
-                return starter.StartNewAsync(nameof(DurableConsumerFuncs.ConsumerOrchestrator), input);
+                return starter.StartNewAsync(nameof(DurableConsumerFuncs.OrchestrateConsumersAsync), input);
             }
 
             return Task.CompletedTask;
