@@ -1,6 +1,7 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ConsumptionFuncs
@@ -17,7 +18,14 @@ namespace ConsumptionFuncs
         {
             if (input != null && input.Count > 0)
             {
-                return starter.StartNewAsync(nameof(DurableConsumerFuncs.OrchestrateConsumersFunc), input);
+                // Send Doc Ids to the orchestrator, otherwise a big Document might exceed 64 KB Storage Queue limit
+                var products = input.Select(x => new CosmosDbIdentity
+                {
+                    Id = x.Value<string>("id"),
+                    PartitionKey = x.Value<string>("productGroupId")
+                });
+
+                return starter.StartNewAsync(nameof(DurableConsumerFuncs.OrchestrateConsumersFunc), products);
             }
 
             return Task.CompletedTask;
