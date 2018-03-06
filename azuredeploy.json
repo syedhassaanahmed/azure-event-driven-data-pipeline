@@ -29,7 +29,7 @@
                 "1",
                 "2"
             ],
-            "defaultValue": "1",
+            "defaultValue": "2",
             "metadata": {
                 "description": "Instance size of the dedicated plan (small, medium, or large)."
             }

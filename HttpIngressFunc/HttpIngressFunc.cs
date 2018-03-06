@@ -6,7 +6,7 @@ namespace HttpIngressFunc
 {
     public static class HttpIngressFunc
     {
-        [FunctionName("HttpIngressFunc")]
+        [FunctionName(nameof(HttpIngressFunc))]
         [return: ServiceBus("productsQueue", AccessRights.Send, Connection = "SERVICEBUS_CONNECTION")]
         public static string Run([HttpTrigger] dynamic product, TraceWriter log)
         {

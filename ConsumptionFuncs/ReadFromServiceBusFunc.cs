@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace ConsumptionFuncs
 {
-    public static class ReadFromServiceBus
+    public static class ReadFromServiceBusFunc
     {
         private static DocumentClient _documentClient;
 
-        [FunctionName("ReadFromServiceBus")]
+        [FunctionName(nameof(ReadFromServiceBusFunc))]
         public static async Task Run([ServiceBusTrigger("productsQueue", AccessRights.Listen, 
             Connection = "SERVICEBUS_CONNECTION")]string productJson, ILogger log)
         {
