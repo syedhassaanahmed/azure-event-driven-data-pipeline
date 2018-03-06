@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ConsumptionFuncs
+namespace ConsumerEgressFuncs
 {
     public static class ChangeFeedFunc
     {
@@ -25,7 +25,7 @@ namespace ConsumptionFuncs
                     PartitionKey = x.Value<string>("productGroupId")
                 });
 
-                return starter.StartNewAsync(nameof(DurableConsumerFuncs.OrchestrateConsumersFunc), products);
+                return starter.StartNewAsync(nameof(ConsumerEgressFuncs.OrchestrateConsumersFunc), products);
             }
 
             return Task.CompletedTask;

@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsumptionFuncs
+namespace ConsumerEgressFuncs
 {
     public class CosmosDbIdentity
     {
@@ -22,7 +22,7 @@ namespace ConsumptionFuncs
         public List<CosmosDbIdentity> ChangedProducts { get; set; }
     }
 
-    public static class DurableConsumerFuncs
+    public static class ConsumerEgressFuncs
     {
         private static DocumentClient _documentClient;
 

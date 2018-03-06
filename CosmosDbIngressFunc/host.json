@@ -1,0 +1,8 @@
+{
+  "applicationInsights": {
+    "sampling": {
+      "isEnabled": true,
+      "maxTelemetryItemsPerSecond": 5
+    }
+  }
+}

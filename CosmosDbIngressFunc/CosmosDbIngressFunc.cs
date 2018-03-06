@@ -7,13 +7,13 @@ using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
-namespace ConsumptionFuncs
+namespace CosmosDbIngressFunc
 {
-    public static class ReadFromServiceBusFunc
+    public static class CosmosDbIngressFunc
     {
         private static DocumentClient _documentClient;
 
-        [FunctionName(nameof(ReadFromServiceBusFunc))]
+        [FunctionName(nameof(CosmosDbIngressFunc))]
         public static async Task Run([ServiceBusTrigger("productsQueue", AccessRights.Listen, 
             Connection = "SERVICEBUS_CONNECTION")]string productJson, ILogger log)
         {
