@@ -224,6 +224,10 @@
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2017-10-01').keys[0].value)]"
                         },
                         {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2017-10-01').keys[0].value)]"
+                        },
+                        {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~1"
                         },
@@ -238,6 +242,14 @@
                         {
                             "name": "SERVICEBUS_CONNECTION",
                             "value": "[listkeys(variables('authRuleResourceId'), '2017-04-01').primaryConnectionString]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[parameters('httpIngressFunctionName')]"
+                        },
+                        {
+                            "name": "SCM_COMMAND_IDLE_TIMEOUT",
+                            "value": "1200"
                         }
                     ]
                 }
@@ -323,8 +335,12 @@
                             "value": "[listKeys(variables('cosmosDbId'), '2016-03-31').primaryMasterKey]"
                         },
                         {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[parameters('cosmosDbIngressFunctionName')]"
+                        },
+                        {
                             "name": "SCM_COMMAND_IDLE_TIMEOUT",
-                            "value": "600"
+                            "value": "1200"
                         }
                     ]
                 }
@@ -409,8 +425,12 @@
                             "value": "[concat('AccountEndpoint=https://', parameters('cosmosDbAccountName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('cosmosDbId'), '2016-03-31').primaryMasterKey, ';')]"
                         },
                         {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[parameters('consumerEgressFunctionName')]"
+                        },
+                        {
                             "name": "SCM_COMMAND_IDLE_TIMEOUT",
-                            "value": "600"
+                            "value": "1200"
                         }
                     ]
                 }
