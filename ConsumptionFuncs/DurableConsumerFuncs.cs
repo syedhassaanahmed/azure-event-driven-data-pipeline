@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
-using Polly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,56 +10,53 @@ namespace ConsumptionFuncs
 {
     public class ConsumerData
     {
-        public string ConsumerId { get; set; }
+        public string ConsumerUrl { get; set; }
         public List<Document> ChangedProducts { get; set; }
     }
 
     public static class DurableConsumerFuncs
     {
-        private static readonly Dictionary<string, string> Consumers = new Dictionary<string, string>
-        {
-            {"C1", "http://"},
-            {"C2", "http://"},
-            {"C3", "http://"}
-        };
-
         [FunctionName(nameof(ConsumerOrchestrator))]
         public static async Task ConsumerOrchestrator([OrchestrationTrigger] DurableOrchestrationContext ctx)
         {
             var changedProducts = ctx.GetInput<List<Document>>();
 
-            var parallelTasks = Consumers.Keys.Select(x => ctx.CallActivityAsync(nameof(SendToConsumerAsync), 
-                new ConsumerData { ConsumerId = x, ChangedProducts = changedProducts }));
+            var retryOptions = new RetryOptions(firstRetryInterval: TimeSpan.FromSeconds(5),
+                maxNumberOfAttempts: 3);
+
+            var consumers = Environment.GetEnvironmentVariable("CONSUMERS", EnvironmentVariableTarget.Process)
+                .Split(new[] { '|' });
+
+            var parallelTasks = consumers.Select(x => CallSendToConsumerActivityAsync(ctx, retryOptions,
+                new ConsumerData { ConsumerUrl = x, ChangedProducts = changedProducts }));
 
             await Task.WhenAll(parallelTasks);
+        }
+
+        public static async Task CallSendToConsumerActivityAsync(DurableOrchestrationContext ctx, RetryOptions retryOptions, 
+            ConsumerData consumerData)
+        {
+            try
+            {
+                await ctx.CallActivityWithRetryAsync(nameof(SendToConsumerAsync), retryOptions, consumerData);
+            }
+            catch
+            {
+                //TODO: TEMPORARILY MARK THE CONSUMER AS BANNED IN CONSUMERDB
+            }
         }
 
         [FunctionName(nameof(SendToConsumerAsync))]
         public static async Task SendToConsumerAsync([ActivityTrigger] DurableActivityContext ctx)
         {
             var consumerData = ctx.GetInput<ConsumerData>();
-            var url = Consumers[consumerData.ConsumerId];
 
-            var policy = Policy.Handle<Exception>().WaitAndRetry(3,
-                attempt => TimeSpan.FromSeconds(0.1 * Math.Pow(2, attempt)));
-
-            try
+            using (var httpClient = new HttpClient())
             {
-                await policy.ExecuteAsync(async () =>
+                foreach (var changedProduct in consumerData.ChangedProducts)
                 {
-                    using (var httpClient = new HttpClient())
-                    {
-                        foreach (var changedProduct in consumerData.ChangedProducts)
-                        {
-                            await httpClient.PostAsync(url, new StringContent(changedProduct.ToString()));
-                        }
-                    }
-                });
-            }
-            catch
-            {
-                // CRITICAL ERROR: Ban the consumer temporarily!!!
-                throw;
+                    await httpClient.PostAsync(consumerData.ConsumerUrl, new StringContent(changedProduct.ToString()));
+                }
             }
         }
     }
