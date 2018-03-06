@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ConsumptionFuncs
@@ -71,7 +72,8 @@ namespace ConsumptionFuncs
                     var document = await _documentClient.ReadDocumentAsync(documentUri, 
                         new RequestOptions { PartitionKey = new PartitionKey(product.PartitionKey) });
 
-                    await httpClient.PostAsync(consumerData.ConsumerUrl, new StringContent(document.ToString()));
+                    var content = new StringContent(document.ToString(), Encoding.UTF8, "application/json");
+                    await httpClient.PostAsync(consumerData.ConsumerUrl, content);
                 }
             }
         }
