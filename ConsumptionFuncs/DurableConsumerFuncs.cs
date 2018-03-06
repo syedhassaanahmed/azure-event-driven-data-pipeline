@@ -16,8 +16,8 @@ namespace ConsumptionFuncs
 
     public static class DurableConsumerFuncs
     {
-        [FunctionName(nameof(OrchestrateConsumersAsync))]
-        public static async Task OrchestrateConsumersAsync([OrchestrationTrigger] DurableOrchestrationContext ctx)
+        [FunctionName(nameof(OrchestrateConsumersFunc))]
+        public static async Task OrchestrateConsumersFunc([OrchestrationTrigger] DurableOrchestrationContext ctx)
         {
             var changedProducts = ctx.GetInput<List<Document>>();
 
@@ -38,7 +38,7 @@ namespace ConsumptionFuncs
         {
             try
             {
-                await ctx.CallActivityWithRetryAsync(nameof(SendToConsumerAsync), retryOptions, consumerData);
+                await ctx.CallActivityWithRetryAsync(nameof(SendToConsumerFunc), retryOptions, consumerData);
             }
             catch
             {
@@ -46,8 +46,8 @@ namespace ConsumptionFuncs
             }
         }
 
-        [FunctionName(nameof(SendToConsumerAsync))]
-        public static async Task SendToConsumerAsync([ActivityTrigger] DurableActivityContext ctx)
+        [FunctionName(nameof(SendToConsumerFunc))]
+        public static async Task SendToConsumerFunc([ActivityTrigger] DurableActivityContext ctx)
         {
             var consumerData = ctx.GetInput<ConsumerData>();
 
