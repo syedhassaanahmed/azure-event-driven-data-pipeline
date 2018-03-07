@@ -23,3 +23,18 @@ customMetrics
 | summarize avg(value) by name, bin(timestamp, 10s)
 | render timechart
 ```
+
+## Resources
+[Choose between Azure services that deliver messages](https://docs.microsoft.com/en-us/azure/event-grid/compare-messaging-services)
+
+[Choose between Flow, Logic Apps, Functions, and WebJobs](https://docs.microsoft.com/en-us/azure/azure-functions/functions-compare-logic-apps-ms-flow-webjobs)
+
+[Durable Functions overview](https://docs.microsoft.com/en-us/azure/azure-functions/durable-functions-overview)
+
+[Azure Functions quickstart starter sample](https://github.com/Azure-Samples/functions-quickstart)
+
+[Understanding Serverless Cold Start](https://blogs.msdn.microsoft.com/appserviceteam/2018/02/07/understanding-serverless-cold-start/)
+
+[Choose the right data store](https://docs.microsoft.com/en-us/azure/architecture/guide/technology-choices/data-store-overview)
+
+[Modeling document data for NoSQL databases](https://docs.microsoft.com/en-us/azure/cosmos-db/modeling-data)
