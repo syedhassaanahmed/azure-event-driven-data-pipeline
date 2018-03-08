@@ -15,11 +15,12 @@ namespace ConsumerReceiveFunc
             TraceWriter log)
         {
             var product = await req.Content.ReadAsStringAsync();
-            bool isOk = new Random().Next(0, 10) < 6;
 
-            return isOk
-                ? req.CreateResponse(HttpStatusCode.OK, "Received Product: " + product)
-                : req.CreateResponse(HttpStatusCode.InternalServerError, "Random Error: " + product);
+            log.Info(product);
+
+            return new Random().Next(0, 10) < 6
+                ? req.CreateResponse(HttpStatusCode.OK, "Product received")
+                : req.CreateResponse(HttpStatusCode.InternalServerError, "Random error");
         }
     }
 }
