@@ -72,7 +72,7 @@ namespace ConsumerEgressFuncs
                     var document = await _documentClient.ReadDocumentAsync(documentUri, 
                         new RequestOptions { PartitionKey = new PartitionKey(product.PartitionKey) });
 
-                    var content = new StringContent(document.ToString(), Encoding.UTF8, "application/json");
+                    var content = new StringContent(document.Resource.ToString(), Encoding.UTF8, "application/json");
                     await httpClient.PostAsync(consumerData.ConsumerUrl, content);
                 }
             }

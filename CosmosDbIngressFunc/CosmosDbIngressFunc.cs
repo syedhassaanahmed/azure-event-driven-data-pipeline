@@ -27,6 +27,10 @@ namespace CosmosDbIngressFunc
         private static async Task UpsertProductAsync(DocumentClient client, Document product, ILogger log)
         {
             var collectionLink = UriFactory.CreateDocumentCollectionUri("masterdata", "product");
+
+            // Explicitly adding partitionKey to the data, gives us the flexibility of modifying it later
+            product.SetPropertyValue("partitionKey", product.GetPropertyValue<string>("productGroupId"));
+
             var response = await client.UpsertDocumentAsync(collectionLink, product);
             log.LogMetric("product_RU", response.RequestCharge);
         }

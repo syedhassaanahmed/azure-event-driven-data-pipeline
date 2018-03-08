@@ -22,7 +22,7 @@ namespace ConsumerEgressFuncs
                 var products = input.Select(x => new CosmosDbIdentity
                 {
                     Id = x.Value<string>("id"),
-                    PartitionKey = x.Value<string>("productGroupId")
+                    PartitionKey = x.Value<string>("partitionKey")
                 });
 
                 return starter.StartNewAsync(nameof(ConsumerEgressFuncs.OrchestrateConsumersFunc), products);
