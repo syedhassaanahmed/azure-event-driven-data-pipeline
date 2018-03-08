@@ -78,6 +78,7 @@
     },
     "variables": {
         "repoURL": "https://github.com/syedhassaanahmed/azure-event-driven-data-pipeline.git",
+        "cosmosDbEndpoint": "[concat('https://', parameters('cosmosDbAccountName'), '.documents.azure.com:443/')]",
         "cosmosDbId": "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]",
         "serviceBusAuth": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespaceName'), 'RootManageSharedAccessKey')]",
         "templatesBaseUri": "https://raw.githubusercontent.com/syedhassaanahmed/azure-event-driven-data-pipeline/master/nested-arm-templates/"
@@ -155,8 +156,8 @@
                     "cosmosDbIngressFunctionName": {
                         "value": "[parameters('cosmosDbIngressFunctionName')]"
                     },
-                    "cosmosDbAccountName": {
-                        "value": "[parameters('cosmosDbAccountName')]"
+                    "cosmosDbEndpoint": {
+                        "value": "[variables('cosmosDbEndpoint')]"
                     },
                     "cosmosDbId": {
                         "value": "[variables('cosmosDbId')]"
@@ -187,8 +188,8 @@
                     "consumerEgressFunctionName": {
                         "value": "[parameters('consumerEgressFunctionName')]"
                     },
-                    "cosmosDbAccountName": {
-                        "value": "[parameters('cosmosDbAccountName')]"
+                    "cosmosDbEndpoint": {
+                        "value": "[variables('cosmosDbEndpoint')]"
                     },
                     "cosmosDbId": {
                         "value": "[variables('cosmosDbId')]"

@@ -5,7 +5,7 @@
         "cosmosDbIngressFunctionName": {
             "type": "string"
         },
-        "cosmosDbAccountName": {
+        "cosmosDbEndpoint": {
             "type": "string"
         },
         "cosmosDbId": {
@@ -114,7 +114,7 @@
                         },
                         {
                             "name": "COSMOSDB_ENDPOINT",
-                            "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))).documentEndpoint]"
+                            "value": "[parameters('cosmosDbEndpoint')]"
                         },
                         {
                             "name": "COSMOSDB_KEY",

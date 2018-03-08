@@ -5,7 +5,7 @@
         "consumerEgressFunctionName": {
             "type": "string"
         },
-        "cosmosDbAccountName": {
+        "cosmosDbEndpoint": {
             "type": "string"
         },
         "cosmosDbId": {
@@ -107,7 +107,7 @@
                         },
                         {
                             "name": "COSMOSDB_ENDPOINT",
-                            "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))).documentEndpoint]"
+                            "value": "[parameters('cosmosDbEndpoint')]"
                         },
                         {
                             "name": "COSMOSDB_KEY",
@@ -115,7 +115,7 @@
                         },
                         {
                             "name": "COSMOSDB_CONNECTION",
-                            "value": "[concat('AccountEndpoint=https://', parameters('cosmosDbAccountName'), '.documents.azure.com:443/;AccountKey=', listKeys(parameters('cosmosDbId'), '2016-03-31').primaryMasterKey, ';')]"
+                            "value": "[concat('AccountEndpoint=', parameters('cosmosDbEndpoint'), ';AccountKey=', listKeys(parameters('cosmosDbId'), '2016-03-31').primaryMasterKey, ';')]"
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
