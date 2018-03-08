@@ -164,9 +164,6 @@
                     "cosmosDbId": {
                         "value": "[variables('cosmosDbId')]"
                     },
-                    "serviceBusNamespaceName": {
-                        "value": "[parameters('serviceBusNamespaceName')]"
-                    },
                     "serviceBusAuth": {
                         "value": "[variables('serviceBusAuth')]"
                     },
