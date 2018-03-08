@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cosmosDbAccountName": {
+            "type": "string"
+        },
+        "serviceBusNamespaceName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "serviceBusQueueName": "productsQueue"
+    },
+    "resources": [
+        {
+            "name": "[parameters('cosmosDbAccountName')]",
+            "type": "Microsoft.DocumentDb/databaseAccounts",
+            "apiVersion": "2016-03-31",
+            "kind": "GlobalDocumentDB",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[parameters('cosmosDbAccountName')]",
+                "databaseAccountOfferType": "Standard"
+            }
+        },
+        {
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('serviceBusNamespaceName')]",
+            "type": "Microsoft.ServiceBus/Namespaces",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {},
+            "resources": [
+                {
+                    "apiVersion": "2017-04-01",
+                    "name": "[variables('serviceBusQueueName')]",
+                    "type": "Queues",
+                    "dependsOn": [
+                        "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]"
+                    ],
+                    "properties": {
+                        "requiresDuplicateDetection": "false",
+                        "requiresSession": "false",
+                        "enablePartitioning": "true",
+                        "enableExpress": "true"
+                    }
+                }
+            ]
+        }
+    ]
+}

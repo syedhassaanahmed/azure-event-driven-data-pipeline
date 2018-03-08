@@ -1,0 +1,141 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cosmosDbIngressFunctionName": {
+            "type": "string"
+        },
+        "cosmosDbAccountName": {
+            "type": "string"
+        },
+        "cosmosDbId": {
+            "type": "string"
+        },
+        "serviceBusNamespaceName": {
+            "type": "string"
+        },
+        "serviceBusAuth": {
+            "type": "string"
+        },
+        "repoURL": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "cosmosDbIngressStorageAccountName": "[concat('cosmosdb', uniqueString(resourceGroup().id))]",
+        "cosmosDbIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('cosmosDbIngressStorageAccountName'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('cosmosDbIngressStorageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "name": "[parameters('cosmosDbIngressFunctionName')]",
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "kind": "other",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ApplicationId": "[parameters('cosmosDbIngressFunctionName')]"
+            }
+        },
+        {
+            "name": "[parameters('cosmosDbIngressFunctionName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2015-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[parameters('cosmosDbIngressFunctionName')]",
+                "computeMode": "Dynamic",
+                "sku": "Dynamic"
+            }
+        },
+        {
+            "name": "[parameters('cosmosDbIngressFunctionName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDbIngressFunctionName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('cosmosDbIngressStorageAccountName'))]",
+                "[concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))]",
+                "[resourceId('microsoft.insights/components', parameters('cosmosDbIngressFunctionName'))]",
+                "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]"
+            ],
+            "resources": [
+                {
+                    "apiVersion": "2016-03-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('cosmosDbIngressFunctionName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[parameters('repoURL')]",
+                        "branch": "master",
+                        "IsManualIntegration": true
+                    }
+                }
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDbIngressFunctionName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('cosmosDbIngressStorageAccountName'), ';AccountKey=', listKeys(variables('cosmosDbIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('cosmosDbIngressStorageAccountName'), ';AccountKey=', listKeys(variables('cosmosDbIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('cosmosDbIngressStorageAccountName'), ';AccountKey=', listKeys(variables('cosmosDbIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~1"
+                        },
+                        {
+                            "name": "AppInsights_InstrumentationKey",
+                            "value": "[reference(concat('microsoft.insights/components/', parameters('cosmosDbIngressFunctionName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "PROJECT",
+                            "value": "azure-functions/CosmosDbIngressFunc/CosmosDbIngressFunc.csproj"
+                        },
+                        {
+                            "name": "SERVICEBUS_CONNECTION",
+                            "value": "[listkeys(parameters('serviceBusAuth'), '2017-04-01').primaryConnectionString]"
+                        },
+                        {
+                            "name": "COSMOSDB_ENDPOINT",
+                            "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))).documentEndpoint]"
+                        },
+                        {
+                            "name": "COSMOSDB_KEY",
+                            "value": "[listKeys(parameters('cosmosDbId'), '2016-03-31').primaryMasterKey]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[parameters('cosmosDbIngressFunctionName')]"
+                        },
+                        {
+                            "name": "SCM_COMMAND_IDLE_TIMEOUT",
+                            "value": "1200"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

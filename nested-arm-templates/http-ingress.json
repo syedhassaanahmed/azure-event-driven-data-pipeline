@@ -1,0 +1,141 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "httpIngressFunctionName": {
+            "type": "string"
+        },
+        "httpIngressSku": {
+            "type": "string"
+        },
+        "httpIngressWorkerSize": {
+            "type": "string"
+        },
+        "httpIngressNumberOfWorkers": {
+            "type": "int"
+        },
+        "serviceBusNamespaceName": {
+            "type": "string"
+        },
+        "serviceBusAuth": {
+            "type": "string"
+        },
+        "repoURL": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "httpIngressStorageAccountName": "[concat('http', uniqueString(resourceGroup().id))]",
+        "httpIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('httpIngressStorageAccountName'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('httpIngressStorageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "name": "[parameters('httpIngressFunctionName')]",
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "kind": "other",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ApplicationId": "[parameters('httpIngressFunctionName')]"
+            }
+        },
+        {
+            "name": "[parameters('httpIngressFunctionName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2015-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[parameters('httpIngressFunctionName')]",
+                "sku": "[parameters('httpIngressSku')]",
+                "workerSize": "[parameters('httpIngressWorkerSize')]",
+                "hostingEnvironment": "",
+                "numberOfWorkers": "[parameters('httpIngressNumberOfWorkers')]"
+            }
+        },
+        {
+            "name": "[parameters('httpIngressFunctionName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('httpIngressStorageAccountName'))]",
+                "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]",
+                "[resourceId('microsoft.insights/components', parameters('httpIngressFunctionName'))]"
+            ],
+            "resources": [
+                {
+                    "apiVersion": "2016-03-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('httpIngressFunctionName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[parameters('repoURL')]",
+                        "branch": "master",
+                        "IsManualIntegration": true
+                    }
+                }
+            ],
+            "properties": {
+                "name": "[parameters('httpIngressFunctionName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]",
+                "hostingEnvironment": "",
+                "clientAffinityEnabled": false,
+                "siteConfig": {
+                    "alwaysOn": true,
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~1"
+                        },
+                        {
+                            "name": "AppInsights_InstrumentationKey",
+                            "value": "[reference(concat('microsoft.insights/components/', parameters('httpIngressFunctionName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "PROJECT",
+                            "value": "azure-functions/HttpIngressFunc/HttpIngressFunc.csproj"
+                        },
+                        {
+                            "name": "SERVICEBUS_CONNECTION",
+                            "value": "[listkeys(parameters('serviceBusAuth'), '2017-04-01').primaryConnectionString]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[parameters('httpIngressFunctionName')]"
+                        },
+                        {
+                            "name": "SCM_COMMAND_IDLE_TIMEOUT",
+                            "value": "1200"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
