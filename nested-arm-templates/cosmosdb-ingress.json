@@ -11,9 +11,6 @@
         "cosmosDbId": {
             "type": "string"
         },
-        "serviceBusNamespaceName": {
-            "type": "string"
-        },
         "serviceBusAuth": {
             "type": "string"
         },
@@ -66,9 +63,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDbIngressFunctionName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('cosmosDbIngressStorageAccountName'))]",
-                "[concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))]",
-                "[resourceId('microsoft.insights/components', parameters('cosmosDbIngressFunctionName'))]",
-                "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]"
+                "[resourceId('microsoft.insights/components', parameters('cosmosDbIngressFunctionName'))]"
             ],
             "resources": [
                 {

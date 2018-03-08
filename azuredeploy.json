@@ -107,6 +107,9 @@
             "apiVersion": "2017-05-10",
             "name": "httpIngress",
             "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'sharedResources')]"
+            ],
             "properties": {
                 "mode": "incremental",
                 "templateLink": {
@@ -142,6 +145,9 @@
             "apiVersion": "2017-05-10",
             "name": "cosmosDbIngress",
             "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'sharedResources')]"
+            ],
             "properties": {
                 "mode": "incremental",
                 "templateLink": {
@@ -174,6 +180,9 @@
             "apiVersion": "2017-05-10",
             "name": "consumerEgress",
             "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'sharedResources')]"
+            ],
             "properties": {
                 "mode": "incremental",
                 "templateLink": {

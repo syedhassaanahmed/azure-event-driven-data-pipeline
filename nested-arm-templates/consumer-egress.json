@@ -60,7 +60,6 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('consumerEgressStorageAccountName'))]",
-                "[concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName'))]",
                 "[resourceId('microsoft.insights/components', parameters('consumerEgressFunctionName'))]"
             ],
             "resources": [
