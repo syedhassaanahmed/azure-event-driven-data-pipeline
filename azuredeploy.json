@@ -129,9 +129,6 @@
                     "httpIngressNumberOfWorkers": {
                         "value": "[parameters('httpIngressNumberOfWorkers')]"
                     },
-                    "serviceBusNamespaceName": {
-                        "value": "[parameters('serviceBusNamespaceName')]"
-                    },
                     "serviceBusAuth": {
                         "value": "[variables('serviceBusAuth')]"
                     },
@@ -187,7 +184,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "cosmosDbIngressFunctionName": {
+                    "consumerEgressFunctionName": {
                         "value": "[parameters('consumerEgressFunctionName')]"
                     },
                     "cosmosDbAccountName": {
@@ -213,7 +210,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "cosmosDbIngressFunctionName": {
+                    "consumerReceiveFunctionName": {
                         "value": "[parameters('consumerReceiveFunctionName')]"
                     },
                     "repoURL": {
