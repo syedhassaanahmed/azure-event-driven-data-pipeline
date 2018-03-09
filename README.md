@@ -1,7 +1,18 @@
 # azure-event-driven-data-pipeline
+
+## Problem
+A large retailer with many source systems, wants a single source of truth of their data and be able to send updates to their consumers whenever this data is changed. They want to support an unpredictable load, with a max spike of 1500 rec/sec.
+
+>Contents of this repo were demonstrated during [Stockholm Azure meetup March 2018](https://www.meetup.com/Stockholm-Azure-Meetup/events/247951748/).
+
+## Architecture
+<div style=""><img src="docs/images/architecture.png"/></center></div>
+
+## Deployment
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
 
-Content of this repo is demonstrated during Stockholm Azure meetup https://www.meetup.com/Stockholm-Azure-Meetup/events/247951748/
+The entire deployment can be orchestrated using [ARM template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-create-first-template) `azuredeploy.json`.
+Once the deployment is complete, the only manual step is to copy `ConsumerReceiveFunc` URL from the Azure portal and paste it multiple times (pipe `|` delimited) in `ConsumerEgressFunc` -> App Settings -> `CONSUMERS`.
 
 ## Running load tests
 We perform the load tests using [Azure Container Instances](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-overview). After creating resources using the above ARM template, run the following load testing script;
@@ -14,7 +25,7 @@ Here is how to stream logs from the container;
 az container attach -g azure-meetup -n loadgen-container
 ```
 
-## Measuring RUs in Application Insights
+## Measuring Cosmos DB RUs using Application Insights
 When we upsert into Cosmos DB, we log the [Request Units](https://docs.microsoft.com/en-us/azure/cosmos-db/request-units) consumed in [Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-overview). The following Application Insights analytics query renders a timechart of RUs consumed, aggregated on 10 seconds.
 ```sql
 customMetrics
