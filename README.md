@@ -1,7 +1,7 @@
 # azure-event-driven-data-pipeline
 
 ## Problem
-A large retailer with many source systems, wants a single source of truth of their data and be able to send updates to their consumers whenever this data is changed. They want to support an unpredictable load, with a max spike of 1500 rec/sec.
+A large retailer with many source systems, wants a single source of truth of their data and be able to send updates to their consumers whenever this data is changed. They want to support an unpredictable load, with a max spike of 1500 req/sec.
 
 >Contents of this repo were demonstrated during [Stockholm Azure meetup March 2018](https://www.meetup.com/Stockholm-Azure-Meetup/events/247951748/).
 
