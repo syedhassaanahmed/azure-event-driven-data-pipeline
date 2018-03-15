@@ -42,8 +42,6 @@ customMetrics
 
 [Durable Functions overview](https://docs.microsoft.com/en-us/azure/azure-functions/durable-functions-overview)
 
-[Azure Functions quickstart starter sample](https://github.com/Azure-Samples/functions-quickstart)
-
 [Understanding Serverless Cold Start](https://blogs.msdn.microsoft.com/appserviceteam/2018/02/07/understanding-serverless-cold-start/)
 
 [Choose the right data store](https://docs.microsoft.com/en-us/azure/architecture/guide/technology-choices/data-store-overview)
