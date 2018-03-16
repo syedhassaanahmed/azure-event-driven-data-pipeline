@@ -75,10 +75,7 @@
                 }
             ],
             "properties": {
-                "name": "[parameters('httpIngressFunctionName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]",
-                "hostingEnvironment": "",
-                "clientAffinityEnabled": false,
                 "siteConfig": {
                     "alwaysOn": true,
                     "appSettings": [
