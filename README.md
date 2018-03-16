@@ -12,17 +12,23 @@ A large retailer with many source systems, wants a single source of truth of the
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
 
 The entire deployment can be orchestrated using [ARM template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-create-first-template) `azuredeploy.json`.
+
+To deploy using [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest);
+```
+az group deployment create -g <RESOURCE_GROUP> --template-file azuredeploy.json
+```
+
 Once the deployment is complete, the only manual step is to copy `ConsumerReceiveFunc` URL from the Azure portal and paste it multiple times (pipe `|` delimited) in `ConsumerEgressFunc` -> App Settings -> `CONSUMERS`.
 
 ## Running load tests
 We perform the load tests using [Azure Container Instances](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-overview). After creating resources using the above ARM template, run the following load testing script;
 ```
-./generate-load.sh azure-meetup loadgen-container https://http-ingress-func.azurewebsites.net/api/HttpIngressFunc?code=<FUNCTION_KEY>
+./generate-load.sh <RESOURCE_GROUP> <CONTAINER_NAME> https://http-ingress-func.azurewebsites.net/api/HttpIngressFunc?code=<FUNCTION_KEY>
 ```
 
 Here is how to stream logs from the container;
 ```
-az container attach -g azure-meetup -n loadgen-container
+az container attach -g <RESOURCE_GROUP> -n <CONTAINER_NAME>
 ```
 
 ## Measuring Cosmos DB RUs using Application Insights
@@ -43,6 +49,8 @@ customMetrics
 [Durable Functions overview](https://docs.microsoft.com/en-us/azure/azure-functions/durable-functions-overview)
 
 [Understanding Serverless Cold Start](https://blogs.msdn.microsoft.com/appserviceteam/2018/02/07/understanding-serverless-cold-start/)
+
+[Processing 100,000 Events Per Second on Azure Functions](https://blogs.msdn.microsoft.com/appserviceteam/2017/09/19/processing-100000-events-per-second-on-azure-functions/)
 
 [Choose the right data store](https://docs.microsoft.com/en-us/azure/architecture/guide/technology-choices/data-store-overview)
 

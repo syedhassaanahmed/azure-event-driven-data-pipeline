@@ -94,10 +94,6 @@
                     "alwaysOn": true,
                     "appSettings": [
                         {
-                            "name": "AzureWebJobsDashboard",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
-                        },
-                        {
                             "name": "AzureWebJobsStorage",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
                         },
