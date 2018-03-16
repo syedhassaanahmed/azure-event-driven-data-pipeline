@@ -9,6 +9,37 @@
                 "description": "Name of the Http ingress function app."
             }
         },
+        "httpIngressSku": {
+            "type": "string",
+            "allowedValues": [
+                "Free",
+                "Shared",
+                "Basic",
+                "Standard"
+            ],
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "Pricing tier for dedicated plan."
+            }
+        },
+        "httpIngressWorkerSize": {
+            "type": "string",
+            "allowedValues": [
+                "0",
+                "1",
+                "2"
+            ],
+            "defaultValue": "2",
+            "metadata": {
+                "description": "Instance size of the dedicated plan (small, medium, or large)."
+            }
+        },
+        "httpIngressNumberOfWorkers": {
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 20,
+            "defaultValue": 10
+        },
         "cosmosDbIngressFunctionName": {
             "type": "string",
             "defaultValue": "cosmosdb-ingress-func",
@@ -89,6 +120,15 @@
                 "parameters": {
                     "httpIngressFunctionName": {
                         "value": "[parameters('httpIngressFunctionName')]"
+                    },
+                    "httpIngressSku": {
+                        "value": "[parameters('httpIngressSku')]"
+                    },
+                    "httpIngressWorkerSize": {
+                        "value": "[parameters('httpIngressWorkerSize')]"
+                    },
+                    "httpIngressNumberOfWorkers": {
+                        "value": "[parameters('httpIngressNumberOfWorkers')]"
                     },
                     "serviceBusAuth": {
                         "value": "[variables('serviceBusAuth')]"

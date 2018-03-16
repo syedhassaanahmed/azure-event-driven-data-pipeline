@@ -5,6 +5,15 @@
         "httpIngressFunctionName": {
             "type": "string"
         },
+        "httpIngressSku": {
+            "type": "string"
+        },
+        "httpIngressWorkerSize": {
+            "type": "string"
+        },
+        "httpIngressNumberOfWorkers": {
+            "type": "int"
+        },
         "serviceBusAuth": {
             "type": "string"
         },
@@ -44,8 +53,10 @@
             "location": "[resourceGroup().location]",
             "properties": {
                 "name": "[parameters('httpIngressFunctionName')]",
-                "computeMode": "Dynamic",
-                "sku": "Dynamic"
+                "sku": "[parameters('httpIngressSku')]",
+                "workerSize": "[parameters('httpIngressWorkerSize')]",
+                "hostingEnvironment": "",
+                "numberOfWorkers": "[parameters('httpIngressNumberOfWorkers')]"
             }
         },
         {
@@ -75,8 +86,12 @@
                 }
             ],
             "properties": {
+                "name": "[parameters('httpIngressFunctionName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]",
+                "hostingEnvironment": "",
+                "clientAffinityEnabled": false,
                 "siteConfig": {
+                    "alwaysOn": true,
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
@@ -109,10 +124,6 @@
                         {
                             "name": "SCM_COMMAND_IDLE_TIMEOUT",
                             "value": "1200"
-                        },
-                        {
-                            "name": "WEBSITE_HTTPSCALEV2_ENABLED",
-                            "value": "1"
                         }
                     ]
                 }
