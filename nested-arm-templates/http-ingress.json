@@ -5,15 +5,6 @@
         "httpIngressFunctionName": {
             "type": "string"
         },
-        "httpIngressSku": {
-            "type": "string"
-        },
-        "httpIngressWorkerSize": {
-            "type": "string"
-        },
-        "httpIngressNumberOfWorkers": {
-            "type": "int"
-        },
         "serviceBusAuth": {
             "type": "string"
         },
@@ -53,10 +44,8 @@
             "location": "[resourceGroup().location]",
             "properties": {
                 "name": "[parameters('httpIngressFunctionName')]",
-                "sku": "[parameters('httpIngressSku')]",
-                "workerSize": "[parameters('httpIngressWorkerSize')]",
-                "hostingEnvironment": "",
-                "numberOfWorkers": "[parameters('httpIngressNumberOfWorkers')]"
+                "computeMode": "Dynamic",
+                "sku": "Dynamic"
             }
         },
         {
@@ -124,6 +113,10 @@
                         {
                             "name": "SCM_COMMAND_IDLE_TIMEOUT",
                             "value": "1200"
+                        },
+                        {
+                            "name": "WEBSITE_HTTPSCALEV2_ENABLED",
+                            "value": "1"
                         }
                     ]
                 }
