@@ -15,7 +15,6 @@ az cosmosdb collection delete -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $C
 az cosmosdb collection delete -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c leases
 az cosmosdb collection create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $COLLECTION_NAME \
     --throughput 25000 --partition-key-path "/partitionKey" --indexing-policy @indexing-policy.json
-az cosmosdb collection create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c leases
 
 SCRIPT_URL=https://raw.githubusercontent.com/syedhassaanahmed/azure-event-driven-data-pipeline/master/load-test/products.lua
 WRK_OPTIONS="-t1 -c100 -d2m -R1500 --latency"
