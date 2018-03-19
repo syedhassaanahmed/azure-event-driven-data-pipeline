@@ -11,7 +11,8 @@ namespace ConsumerReceiveFunc
     public static class ConsumerReceiveFunc
     {
         [FunctionName(nameof(ConsumerReceiveFunc))]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post")]HttpRequestMessage req, 
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post")]
+            HttpRequestMessage req,
             TraceWriter log)
         {
             var product = await req.Content.ReadAsStringAsync();

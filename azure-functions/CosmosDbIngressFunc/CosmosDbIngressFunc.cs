@@ -11,27 +11,25 @@ namespace CosmosDbIngressFunc
 {
     public static class CosmosDbIngressFunc
     {
-        private static DocumentClient _documentClient;
+        private static readonly DocumentClient DocumentClient = CreateDocumentClient();
 
         [FunctionName(nameof(CosmosDbIngressFunc))]
-        public static async Task Run([ServiceBusTrigger("productsQueue", AccessRights.Listen, 
-            Connection = "SERVICEBUS_CONNECTION")]string productJson, ILogger log)
+        public static async Task Run([ServiceBusTrigger("productsQueue", AccessRights.Listen,
+                Connection = "SERVICEBUS_CONNECTION")]
+            string productJson, ILogger log)
         {
-            if (_documentClient == null)
-                _documentClient = CreateDocumentClient();
-
             var product = JsonConvert.DeserializeObject<Document>(productJson);
-            await UpsertProductAsync(_documentClient, product, log);
+            await UpsertProductAsync(product, log);
         }
 
-        private static async Task UpsertProductAsync(DocumentClient client, Document product, ILogger log)
+        private static async Task UpsertProductAsync(Document product, ILogger log)
         {
             var collectionLink = UriFactory.CreateDocumentCollectionUri("masterdata", "product");
 
             // Explicitly adding partitionKey to the data, gives us the flexibility of modifying it later
             product.SetPropertyValue("partitionKey", product.GetPropertyValue<string>("productGroupId"));
 
-            var response = await client.UpsertDocumentAsync(collectionLink, product);
+            var response = await DocumentClient.UpsertDocumentAsync(collectionLink, product);
             log.LogMetric("product_RU", response.RequestCharge);
         }
 

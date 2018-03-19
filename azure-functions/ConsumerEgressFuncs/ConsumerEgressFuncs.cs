@@ -24,7 +24,7 @@ namespace ConsumerEgressFuncs
 
     public static class ConsumerEgressFuncs
     {
-        private static DocumentClient _documentClient;
+        private static readonly DocumentClient DocumentClient = CreateDocumentClient();
 
         [FunctionName(nameof(OrchestrateConsumersFunc))]
         public static async Task OrchestrateConsumersFunc([OrchestrationTrigger] DurableOrchestrationContext ctx)
@@ -35,15 +35,15 @@ namespace ConsumerEgressFuncs
                 maxNumberOfAttempts: 3);
 
             var consumers = Environment.GetEnvironmentVariable("CONSUMERS", EnvironmentVariableTarget.Process)
-                .Split(new[] { '|' });
+                ?.Split('|');
 
             var parallelTasks = consumers.Select(x => CallSendToConsumerActivityAsync(ctx, retryOptions,
-                new ConsumerData { ConsumerUrl = x, ChangedProducts = changedProductIds }));
+                new ConsumerData {ConsumerUrl = x, ChangedProducts = changedProductIds}));
 
             await Task.WhenAll(parallelTasks);
         }
 
-        public static async Task CallSendToConsumerActivityAsync(DurableOrchestrationContext ctx, 
+        public static async Task CallSendToConsumerActivityAsync(DurableOrchestrationContext ctx,
             Microsoft.Azure.WebJobs.RetryOptions retryOptions, ConsumerData consumerData)
         {
             try
@@ -61,16 +61,13 @@ namespace ConsumerEgressFuncs
         {
             var consumerData = ctx.GetInput<ConsumerData>();
 
-            if (_documentClient == null)
-                _documentClient = CreateDocumentClient();
-
             using (var httpClient = new HttpClient())
             {
                 foreach (var product in consumerData.ChangedProducts)
                 {
                     var documentUri = UriFactory.CreateDocumentUri("masterdata", "product", product.Id);
-                    var document = await _documentClient.ReadDocumentAsync(documentUri, 
-                        new RequestOptions { PartitionKey = new PartitionKey(product.PartitionKey) });
+                    var document = await DocumentClient.ReadDocumentAsync(documentUri,
+                        new RequestOptions {PartitionKey = new PartitionKey(product.PartitionKey)});
 
                     var content = new StringContent(document.Resource.ToString(), Encoding.UTF8, "application/json");
                     await httpClient.PostAsync(consumerData.ConsumerUrl, content);
