@@ -47,10 +47,8 @@
             "location": "[resourceGroup().location]",
             "properties": {
                 "name": "[parameters('consumerEgressFunctionName')]",
-                "sku": "Standard",
-                "workerSize": "2",
-                "hostingEnvironment": "",
-                "numberOfWorkers": "1"
+                "computeMode": "Dynamic",
+                "sku": "Dynamic"
             }
         },
         {
@@ -81,10 +79,7 @@
             ],
             "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]",
-                "hostingEnvironment": "",
-                "clientAffinityEnabled": false,
                 "siteConfig": {
-                    "alwaysOn": true,
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
