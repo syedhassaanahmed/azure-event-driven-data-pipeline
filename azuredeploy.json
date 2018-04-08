@@ -38,7 +38,7 @@
             "type": "int",
             "minValue": 1,
             "maxValue": 20,
-            "defaultValue": 10
+            "defaultValue": 7
         },
         "cosmosDbIngressFunctionName": {
             "type": "string",
