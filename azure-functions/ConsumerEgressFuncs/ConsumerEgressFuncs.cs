@@ -24,6 +24,7 @@ namespace ConsumerEgressFuncs
 
     public static class ConsumerEgressFuncs
     {
+        private static readonly HttpClient HttpClient = new HttpClient();
         private static readonly DocumentClient DocumentClient = CreateDocumentClient();
 
         [FunctionName(nameof(OrchestrateConsumersFunc))]
@@ -52,7 +53,7 @@ namespace ConsumerEgressFuncs
             }
             catch
             {
-                //TODO: TEMPORARILY MARK THE CONSUMER AS BANNED IN CONSUMERDB
+                //TODO: TEMPORARILY MARK THE CONSUMER AS BANNED IN CONSUMER_DB
             }
         }
 
@@ -61,17 +62,14 @@ namespace ConsumerEgressFuncs
         {
             var consumerData = ctx.GetInput<ConsumerData>();
 
-            using (var httpClient = new HttpClient())
+            foreach (var product in consumerData.ChangedProducts)
             {
-                foreach (var product in consumerData.ChangedProducts)
-                {
-                    var documentUri = UriFactory.CreateDocumentUri("masterdata", "product", product.Id);
-                    var document = await DocumentClient.ReadDocumentAsync(documentUri,
-                        new RequestOptions {PartitionKey = new PartitionKey(product.PartitionKey)});
+                var documentUri = UriFactory.CreateDocumentUri("masterdata", "product", product.Id);
+                var document = await DocumentClient.ReadDocumentAsync(documentUri,
+                    new RequestOptions { PartitionKey = new PartitionKey(product.PartitionKey) });
 
-                    var content = new StringContent(document.Resource.ToString(), Encoding.UTF8, "application/json");
-                    await httpClient.PostAsync(consumerData.ConsumerUrl, content);
-                }
+                var content = new StringContent(document.Resource.ToString(), Encoding.UTF8, "application/json");
+                await HttpClient.PostAsync(consumerData.ConsumerUrl, content);
             }
         }
 
