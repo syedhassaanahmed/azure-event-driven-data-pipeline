@@ -78,7 +78,7 @@ namespace ConsumerEgressFuncs
             var endpoint = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT", EnvironmentVariableTarget.Process);
             var authKey = Environment.GetEnvironmentVariable("COSMOSDB_KEY", EnvironmentVariableTarget.Process);
 
-            return new DocumentClient(new Uri(endpoint), authKey, null, ConsistencyLevel.ConsistentPrefix);
+            return new DocumentClient(new Uri(endpoint), authKey);
         }
     }
 }
