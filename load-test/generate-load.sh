@@ -11,8 +11,11 @@ DB_NAME=masterdata
 COLLECTION_NAME=product
 COSMOS_DB=$(az cosmosdb list -g $RESOURCE_GROUP --query "[0].name" -o tsv)
 az cosmosdb database create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME
-az cosmosdb collection delete -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $COLLECTION_NAME
+
 az cosmosdb collection delete -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c leases
+az cosmosdb collection delete -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $COLLECTION_NAME
+
+az cosmosdb collection create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c leases
 az cosmosdb collection create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $COLLECTION_NAME \
     --throughput 25000 --partition-key-path "/partitionKey" --indexing-policy @indexing-policy.json
 
