@@ -98,10 +98,6 @@
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
                         },
                         {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
-                        },
-                        {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~1"
                         },
@@ -116,10 +112,6 @@
                         {
                             "name": "SERVICEBUS_CONNECTION",
                             "value": "[listkeys(parameters('serviceBusAuth'), '2017-04-01').primaryConnectionString]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[parameters('httpIngressFunctionName')]"
                         },
                         {
                             "name": "SCM_COMMAND_IDLE_TIMEOUT",
