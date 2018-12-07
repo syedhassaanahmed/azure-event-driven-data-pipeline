@@ -9,7 +9,28 @@
                 "description": "Name of the Http ingress function app."
             }
         },
-        "httpIngressSku": {
+        "httpIngressSkuName": {
+            "type": "string",
+            "defaultValue": "S1",
+            "allowedValues": [
+                "F1",
+                "D1",
+                "B1",
+                "B2",
+                "B3",
+                "S1",
+                "S2",
+                "S3",
+                "P1",
+                "P2",
+                "P3",
+                "P4"
+            ],
+            "metadata": {
+                "description": "Pricing tier of dedicated plan. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+            }
+        },
+        "httpIngressSkuTier": {
             "type": "string",
             "allowedValues": [
                 "Free",
@@ -22,19 +43,7 @@
                 "description": "Pricing tier for dedicated plan."
             }
         },
-        "httpIngressWorkerSize": {
-            "type": "string",
-            "allowedValues": [
-                "0",
-                "1",
-                "2"
-            ],
-            "defaultValue": "2",
-            "metadata": {
-                "description": "Instance size of the dedicated plan (small, medium, or large)."
-            }
-        },
-        "httpIngressNumberOfWorkers": {
+        "httpIngressSkuCapacity": {
             "type": "int",
             "minValue": 1,
             "maxValue": 20,
@@ -121,14 +130,14 @@
                     "httpIngressFunctionName": {
                         "value": "[parameters('httpIngressFunctionName')]"
                     },
-                    "httpIngressSku": {
-                        "value": "[parameters('httpIngressSku')]"
+                    "httpIngressSkuName": {
+                        "value": "[parameters('httpIngressSkuName')]"
                     },
-                    "httpIngressWorkerSize": {
-                        "value": "[parameters('httpIngressWorkerSize')]"
+                    "httpIngressSkuTier": {
+                        "value": "[parameters('httpIngressSkuTier')]"
                     },
-                    "httpIngressNumberOfWorkers": {
-                        "value": "[parameters('httpIngressNumberOfWorkers')]"
+                    "httpIngressSkuCapacity": {
+                        "value": "[parameters('httpIngressSkuCapacity')]"
                     },
                     "serviceBusAuth": {
                         "value": "[variables('serviceBusAuth')]"

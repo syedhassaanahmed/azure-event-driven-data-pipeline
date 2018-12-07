@@ -5,13 +5,13 @@
         "httpIngressFunctionName": {
             "type": "string"
         },
-        "httpIngressSku": {
+        "httpIngressSkuName": {
             "type": "string"
         },
-        "httpIngressWorkerSize": {
+        "httpIngressSkuTier": {
             "type": "string"
         },
-        "httpIngressNumberOfWorkers": {
+        "httpIngressSkuCapacity": {
             "type": "int"
         },
         "serviceBusAuth": {
@@ -51,12 +51,10 @@
             "type": "Microsoft.Web/serverFarms",
             "apiVersion": "2018-02-01",
             "location": "[resourceGroup().location]",
-            "properties": {
-                "name": "[parameters('httpIngressFunctionName')]",
-                "sku": "[parameters('httpIngressSku')]",
-                "workerSize": "[parameters('httpIngressWorkerSize')]",
-                "hostingEnvironment": "",
-                "numberOfWorkers": "[parameters('httpIngressNumberOfWorkers')]"
+            "sku": {
+                "name": "[parameters('httpIngressSkuName')]",
+                "tier": "[parameters('httpIngressSkuTier')]",
+                "capacity": "[parameters('httpIngressSkuCapacity')]"
             }
         },
         {
