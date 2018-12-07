@@ -1,8 +1,11 @@
 {
-  "applicationInsights": {
-    "sampling": {
-      "isEnabled": true,
-      "maxTelemetryItemsPerSecond": 5
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "maxTelemetryItemsPerSecond": 5
+      }
     }
   }
 }

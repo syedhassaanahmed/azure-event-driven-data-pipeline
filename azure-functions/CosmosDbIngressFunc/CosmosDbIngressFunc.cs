@@ -2,7 +2,6 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
@@ -14,8 +13,7 @@ namespace CosmosDbIngressFunc
         private static readonly DocumentClient DocumentClient = CreateDocumentClient();
 
         [FunctionName(nameof(CosmosDbIngressFunc))]
-        public static async Task Run([ServiceBusTrigger("productsQueue", AccessRights.Listen,
-                Connection = "SERVICEBUS_CONNECTION")]
+        public static async Task Run([ServiceBusTrigger("productsQueue", Connection = "SERVICEBUS_CONNECTION")]
             string productJson, ILogger log)
         {
             var product = JsonConvert.DeserializeObject<Document>(productJson);

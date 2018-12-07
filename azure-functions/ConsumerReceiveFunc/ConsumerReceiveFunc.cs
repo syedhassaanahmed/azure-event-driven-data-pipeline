@@ -1,27 +1,27 @@
 using System;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace ConsumerReceiveFunc
 {
     public static class ConsumerReceiveFunc
     {
         [FunctionName(nameof(ConsumerReceiveFunc))]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post")]
-            HttpRequestMessage req,
-            TraceWriter log)
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+            ILogger log)
         {
-            var product = await req.Content.ReadAsStringAsync();
+            var product = await req.ReadAsStringAsync();
 
-            log.Info(product);
+            log.LogInformation(product);
 
             return new Random().Next(0, 10) < 6
-                ? req.CreateResponse(HttpStatusCode.OK, "Product received")
-                : req.CreateResponse(HttpStatusCode.InternalServerError, "Random error");
+                ? (ActionResult)new OkObjectResult("Product received")
+                : new BadRequestObjectResult("Random error");
         }
     }
 }

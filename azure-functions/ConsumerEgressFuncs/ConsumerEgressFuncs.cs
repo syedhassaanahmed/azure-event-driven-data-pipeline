@@ -1,6 +1,5 @@
-﻿using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,46 +9,32 @@ using System.Threading.Tasks;
 
 namespace ConsumerEgressFuncs
 {
-    public class CosmosDbIdentity
-    {
-        public string Id { get; set; }
-        public string PartitionKey { get; set; }
-    }
-
-    public class ConsumerData
-    {
-        public string ConsumerUrl { get; set; }
-        public List<CosmosDbIdentity> ChangedProducts { get; set; }
-    }
-
     public static class ConsumerEgressFuncs
     {
         private static readonly HttpClient HttpClient = new HttpClient();
-        private static readonly DocumentClient DocumentClient = CreateDocumentClient();
 
         [FunctionName(nameof(OrchestrateConsumersFunc))]
         public static async Task OrchestrateConsumersFunc([OrchestrationTrigger] DurableOrchestrationContext ctx)
         {
-            var changedProductIds = ctx.GetInput<List<CosmosDbIdentity>>();
+            var changedProducts = ctx.GetInput<IEnumerable<string>>();
 
-            var retryOptions = new Microsoft.Azure.WebJobs.RetryOptions(firstRetryInterval: TimeSpan.FromSeconds(5),
+            var retryOptions = new RetryOptions(firstRetryInterval: TimeSpan.FromSeconds(5),
                 maxNumberOfAttempts: 3);
 
             var consumers = Environment.GetEnvironmentVariable("CONSUMERS", EnvironmentVariableTarget.Process)
                 ?.Split('|');
 
-            var parallelTasks = consumers.Select(x => CallSendToConsumerActivityAsync(ctx, retryOptions,
-                new ConsumerData {ConsumerUrl = x, ChangedProducts = changedProductIds}));
+            var parallelTasks = consumers.Select(x => CallSendToConsumerActivityAsync(ctx, retryOptions, x, changedProducts));
 
             await Task.WhenAll(parallelTasks);
         }
 
         public static async Task CallSendToConsumerActivityAsync(DurableOrchestrationContext ctx,
-            Microsoft.Azure.WebJobs.RetryOptions retryOptions, ConsumerData consumerData)
+            RetryOptions retryOptions, string consumerUrl, IEnumerable<string> changedProducts)
         {
             try
             {
-                await ctx.CallActivityWithRetryAsync(nameof(SendToConsumerFunc), retryOptions, consumerData);
+                await ctx.CallActivityWithRetryAsync(nameof(SendToConsumerFunc), retryOptions, (consumerUrl, changedProducts));
             }
             catch
             {
@@ -58,27 +43,14 @@ namespace ConsumerEgressFuncs
         }
 
         [FunctionName(nameof(SendToConsumerFunc))]
-        public static async Task SendToConsumerFunc([ActivityTrigger] DurableActivityContext ctx)
+        public static async Task SendToConsumerFunc([ActivityTrigger] (string consumerUrl, IEnumerable<string> changedProducts) consumerData, 
+            ILogger log)
         {
-            var consumerData = ctx.GetInput<ConsumerData>();
-
-            foreach (var product in consumerData.ChangedProducts)
+            foreach (var product in consumerData.changedProducts)
             {
-                var documentUri = UriFactory.CreateDocumentUri("masterdata", "product", product.Id);
-                var document = await DocumentClient.ReadDocumentAsync(documentUri,
-                    new RequestOptions { PartitionKey = new PartitionKey(product.PartitionKey) });
-
-                var content = new StringContent(document.Resource.ToString(), Encoding.UTF8, "application/json");
-                await HttpClient.PostAsync(consumerData.ConsumerUrl, content);
+                var content = new StringContent(product, Encoding.UTF8, "application/json");
+                await HttpClient.PostAsync(consumerData.consumerUrl, content);
             }
-        }
-
-        private static DocumentClient CreateDocumentClient()
-        {
-            var endpoint = Environment.GetEnvironmentVariable("COSMOSDB_ENDPOINT", EnvironmentVariableTarget.Process);
-            var authKey = Environment.GetEnvironmentVariable("COSMOSDB_KEY", EnvironmentVariableTarget.Process);
-
-            return new DocumentClient(new Uri(endpoint), authKey);
         }
     }
 }

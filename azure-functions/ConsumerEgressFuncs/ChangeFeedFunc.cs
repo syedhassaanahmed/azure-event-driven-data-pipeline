@@ -1,8 +1,9 @@
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 
 namespace ConsumerEgressFuncs
 {
@@ -12,21 +13,15 @@ namespace ConsumerEgressFuncs
         public static Task Run([CosmosDBTrigger(
                 databaseName: "masterdata",
                 collectionName: "product",
-                CreateLeaseCollectionIfNotExists = true,
                 ConnectionStringSetting = "COSMOSDB_CONNECTION",
-                LeaseCollectionName = "leases")]
-            JArray input, [OrchestrationClient] DurableOrchestrationClient starter, TraceWriter log)
+                LeaseCollectionName = "leases", 
+                CreateLeaseCollectionIfNotExists = true)]
+            IReadOnlyList<Document> input, [OrchestrationClient] DurableOrchestrationClient starter, ILogger log)
         {
             if (input == null || input.Count <= 0)
                 return Task.CompletedTask;
 
-            // Send Doc Ids to the orchestrator, otherwise a big Document might exceed 64 KB Storage Queue limit
-            var products = input.Select(x => new CosmosDbIdentity
-            {
-                Id = x.Value<string>("id"),
-                PartitionKey = x.Value<string>("partitionKey")
-            });
-
+            var products = input.Select(x => x.ToString());
             return starter.StartNewAsync(nameof(ConsumerEgressFuncs.OrchestrateConsumersFunc), products);
         }
     }
