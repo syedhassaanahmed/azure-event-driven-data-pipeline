@@ -43,7 +43,7 @@
         {
             "name": "[parameters('consumerEgressFunctionName')]",
             "type": "Microsoft.Web/serverFarms",
-            "apiVersion": "2018-02-01",
+            "apiVersion": "2015-04-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "name": "[parameters('consumerEgressFunctionName')]",
