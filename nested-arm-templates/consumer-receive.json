@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-10-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "consumerReceiveFunctionName": {
@@ -17,7 +17,7 @@
         {
             "name": "[variables('consumerReceiveStorageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2018-07-01",
             "location": "[resourceGroup().location]",
             "kind": "Storage",
             "sku": {
@@ -26,8 +26,8 @@
         },
         {
             "name": "[parameters('consumerReceiveFunctionName')]",
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2015-04-01",
+            "type": "Microsoft.Web/serverFarms",
+            "apiVersion": "2018-02-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "name": "[parameters('consumerReceiveFunctionName')]",
@@ -38,7 +38,7 @@
         {
             "name": "[parameters('consumerReceiveFunctionName')]",
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-02-01",
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
@@ -47,9 +47,9 @@
             ],
             "resources": [
                 {
-                    "apiVersion": "2016-03-01",
                     "name": "web",
-                    "type": "sourcecontrols",
+                    "type": "sourceControls",
+                    "apiVersion": "2018-02-01",
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/Sites', parameters('consumerReceiveFunctionName'))]"
                     ],

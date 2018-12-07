@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-10-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "httpIngressFunctionName": {
@@ -85,7 +85,7 @@
     },
     "resources": [
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2018-09-01",
             "name": "sharedResources",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -105,7 +105,7 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2018-09-01",
             "name": "httpIngress",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
@@ -140,7 +140,7 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2018-09-01",
             "name": "cosmosDbIngress",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
@@ -172,7 +172,7 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2018-09-01",
             "name": "consumerEgress",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
@@ -201,7 +201,7 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2018-09-01",
             "name": "consumerReceive",
             "type": "Microsoft.Resources/deployments",
             "properties": {
