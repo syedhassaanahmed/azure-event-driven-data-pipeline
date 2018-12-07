@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-10-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "httpIngressFunctionName": {
@@ -220,5 +220,11 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "consumerReceiveKey": {
+            "type": "string",
+            "value": "[listsecrets(resourceId('Microsoft.Web/sites/functions', parameters('consumerReceiveFunctionName'), 'ConsumerReceiveFunc'),'2018-02-01').key]"
+        }        
+    }
 }
