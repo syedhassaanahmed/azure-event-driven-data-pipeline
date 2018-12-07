@@ -83,15 +83,15 @@
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerEgressStorageAccountName'), ';AccountKey=', listKeys(variables('consumerEgressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerEgressStorageAccountName'), ';AccountKey=', listKeys(variables('consumerEgressStorageAccountId'),'2018-07-01').keys[0].value)]"
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerEgressStorageAccountName'), ';AccountKey=', listKeys(variables('consumerEgressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerEgressStorageAccountName'), ';AccountKey=', listKeys(variables('consumerEgressStorageAccountId'),'2018-07-01').keys[0].value)]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~1"
+                            "value": "~2"
                         },
                         {
                             "name": "AppInsights_InstrumentationKey",
@@ -100,14 +100,6 @@
                         {
                             "name": "PROJECT",
                             "value": "azure-functions/ConsumerEgressFuncs/ConsumerEgressFuncs.csproj"
-                        },
-                        {
-                            "name": "COSMOSDB_ENDPOINT",
-                            "value": "[parameters('cosmosDbEndpoint')]"
-                        },
-                        {
-                            "name": "COSMOSDB_KEY",
-                            "value": "[listKeys(parameters('cosmosDbId'), '2016-03-31').primaryMasterKey]"
                         },
                         {
                             "name": "COSMOSDB_CONNECTION",

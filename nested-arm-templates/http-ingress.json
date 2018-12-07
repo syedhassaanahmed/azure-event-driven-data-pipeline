@@ -95,11 +95,11 @@
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2017-10-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2018-07-01').keys[0].value)]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~1"
+                            "value": "~2"
                         },
                         {
                             "name": "AppInsights_InstrumentationKey",
