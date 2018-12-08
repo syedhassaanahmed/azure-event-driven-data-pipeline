@@ -73,6 +73,10 @@
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerReceiveStorageAccountName'), ';AccountKey=', listKeys(variables('consumerReceiveStorageAccountId'),'2018-07-01').keys[0].value)]"
                         },
                         {
+                            "name": "AzureWebJobsSecretStorageType",
+                            "value": "Files"
+                        },
+                        {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerReceiveStorageAccountName'), ';AccountKey=', listKeys(variables('consumerReceiveStorageAccountId'),'2018-07-01').keys[0].value)]"
                         },
