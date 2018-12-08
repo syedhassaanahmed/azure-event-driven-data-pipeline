@@ -24,7 +24,7 @@
     "variables": {
         "httpIngressStorageAccountName": "[concat('http', uniqueString(resourceGroup().id))]",
         "httpIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('httpIngressStorageAccountName'))]",
-        "httpIngressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]"
+        "httpIngressServerFarmId": "[resourceId('Microsoft.Web/serverFarms', parameters('httpIngressFunctionName'))]"
     },
     "resources": [
         {

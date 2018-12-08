@@ -16,7 +16,9 @@ namespace ConsumerEgressFuncs
                 ConnectionStringSetting = "COSMOSDB_CONNECTION",
                 LeaseCollectionName = "leases", 
                 CreateLeaseCollectionIfNotExists = true)]
-            IReadOnlyList<Document> input, [OrchestrationClient] DurableOrchestrationClient starter, ILogger log)
+            IReadOnlyList<Document> input, 
+            [OrchestrationClient] DurableOrchestrationClient starter, 
+            ILogger log)
         {
             if (input == null || input.Count <= 0)
                 return Task.CompletedTask;

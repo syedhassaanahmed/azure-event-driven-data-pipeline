@@ -1,8 +1,9 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then echo "RESOURCE_GROUP was not supplied"; exit 1; fi && RESOURCE_GROUP=$1
-if [ -z "$2" ]; then echo "CONTAINER_NAME was not supplied"; exit 1; fi && CONTAINER_NAME=$2
-if [ -z "$3" ]; then echo "TARGET_URL was not supplied"; exit 1; fi && TARGET_URL=$3
+if [ -z "$2" ]; then echo "CONSUMER_EGRESS_FUNCTION was not supplied"; exit 1; fi && CONSUMER_EGRESS_FUNCTION=$2
+if [ -z "$3" ]; then echo "CONTAINER_NAME was not supplied"; exit 1; fi && CONTAINER_NAME=$3
+if [ -z "$4" ]; then echo "TARGET_URL was not supplied"; exit 1; fi && TARGET_URL=$4
 
 az container delete -g $RESOURCE_GROUP --name $CONTAINER_NAME -y
 
@@ -17,6 +18,8 @@ az cosmosdb collection delete -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $C
 
 az cosmosdb collection create -g $RESOURCE_GROUP -n $COSMOS_DB -d $DB_NAME -c $COLLECTION_NAME \
     --throughput 25000 --partition-key-path "/partitionKey" --indexing-policy @indexing-policy.json
+
+az functionapp restart -g $RESOURCE_GROUP -n $CONSUMER_EGRESS_FUNCTION
 
 SCRIPT_URL=https://raw.githubusercontent.com/syedhassaanahmed/azure-event-driven-data-pipeline/master/load-test/products.lua
 WRK_OPTIONS="-t1 -c100 -d2m -R1500 --latency"

@@ -21,7 +21,7 @@
     "variables": {
         "cosmosDbIngressStorageAccountName": "[concat('cosmosdb', uniqueString(resourceGroup().id))]",
         "cosmosDbIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('cosmosDbIngressStorageAccountName'))]",
-        "cosmosDbIngressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDbIngressFunctionName'))]"
+        "cosmosDbIngressServerFarmId": "[resourceId('Microsoft.Web/serverFarms', parameters('cosmosDbIngressFunctionName'))]"
     },
     "resources": [
         {

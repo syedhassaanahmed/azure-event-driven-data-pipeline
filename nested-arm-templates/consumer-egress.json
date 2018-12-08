@@ -18,7 +18,7 @@
     "variables": {
         "consumerEgressStorageAccountName": "[concat('consumer', uniqueString(resourceGroup().id))]",
         "consumerEgressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('consumerEgressStorageAccountName'))]",
-        "consumerEgressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]"
+        "consumerEgressServerFarmId": "[resourceId('Microsoft.Web/serverFarms', parameters('consumerEgressFunctionName'))]"
     },
     "resources": [
         {

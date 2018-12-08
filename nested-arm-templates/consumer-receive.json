@@ -12,7 +12,7 @@
     "variables": {
         "consumerReceiveStorageAccountName": "[concat('receiver', uniqueString(resourceGroup().id))]",
         "consumerReceiveStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('consumerReceiveStorageAccountName'))]",
-        "consumerReceiveServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerReceiveFunctionName'))]"
+        "consumerReceiveServerFarmId": "[resourceId('Microsoft.Web/serverFarms', parameters('consumerReceiveFunctionName'))]"
     },
     "resources": [
         {
