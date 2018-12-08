@@ -11,7 +11,7 @@
         },
         "httpIngressSkuName": {
             "type": "string",
-            "defaultValue": "S1",
+            "defaultValue": "S3",
             "allowedValues": [
                 "F1",
                 "D1",
@@ -27,7 +27,7 @@
                 "P4"
             ],
             "metadata": {
-                "description": "Pricing tier of dedicated plan. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+                "description": "Pricing SKU of dedicated plan. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
             }
         },
         "httpIngressSkuTier": {

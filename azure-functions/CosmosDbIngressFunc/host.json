@@ -7,5 +7,11 @@
         "maxTelemetryItemsPerSecond": 5
       }
     }
+  },
+  "extensions": {
+    "cosmosDB": {
+        "connectionMode": "Direct",
+        "protocol": "Tcp"
+    }
   }
 }

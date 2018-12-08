@@ -18,8 +18,6 @@ To deploy using [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-a
 az group deployment create -g <RESOURCE_GROUP> --template-file azuredeploy.json
 ```
 
-Once the deployment is complete, the only **manual step** is to copy `ConsumerReceiveFunc` URL from the Azure portal and paste it multiple times (pipe `|` delimited) in `ConsumerEgressFunc` -> App Settings -> `CONSUMERS`.
-
 ## Running load tests
 We perform the load tests using [Azure Container Instances](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-overview). After creating resources using the above ARM template, run the following load testing script;
 ```
@@ -57,5 +55,7 @@ customMetrics
 [Choose the right data store](https://docs.microsoft.com/en-us/azure/architecture/guide/technology-choices/data-store-overview)
 
 [Modeling document data for NoSQL databases](https://docs.microsoft.com/en-us/azure/cosmos-db/modeling-data)
+
+[A fast, serverless, big data pipeline powered by a single Azure Function](https://azure.microsoft.com/en-us/blog/a-fast-serverless-big-data-pipeline-powered-by-a-single-azure-function/)
 
 [Load testing with Azure Container Instances and wrk](https://blog.vjrantal.net/2017/08/10/load-testing-with-azure-container-instances-and-wrk/)
