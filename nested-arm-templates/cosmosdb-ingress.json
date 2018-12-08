@@ -20,7 +20,8 @@
     },
     "variables": {
         "cosmosDbIngressStorageAccountName": "[concat('cosmosdb', uniqueString(resourceGroup().id))]",
-        "cosmosDbIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('cosmosDbIngressStorageAccountName'))]"
+        "cosmosDbIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('cosmosDbIngressStorageAccountName'))]",
+        "cosmosDbIngressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDbIngressFunctionName'))]"
     },
     "resources": [
         {
@@ -61,8 +62,8 @@
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDbIngressFunctionName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('cosmosDbIngressStorageAccountName'))]",
+                "[variables('cosmosDbIngressServerFarmId')]",
+                "[variables('cosmosDbIngressStorageAccountId')]",
                 "[resourceId('microsoft.insights/components', parameters('cosmosDbIngressFunctionName'))]"
             ],
             "resources": [
@@ -81,7 +82,7 @@
                 }
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('cosmosDbIngressFunctionName'))]",
+                "serverFarmId": "[variables('cosmosDbIngressServerFarmId')]",
                 "siteConfig": {
                     "appSettings": [
                         {

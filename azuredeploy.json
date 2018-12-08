@@ -90,7 +90,10 @@
         "cosmosDbEndpoint": "[concat('https://', parameters('cosmosDbAccountName'), '.documents.azure.com:443/')]",
         "cosmosDbId": "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]",
         "serviceBusAuth": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespaceName'), 'RootManageSharedAccessKey')]",
-        "templatesBaseUri": "https://raw.githubusercontent.com/syedhassaanahmed/azure-event-driven-data-pipeline/master/nested-arm-templates/"
+        "templatesBaseUri": "https://raw.githubusercontent.com/syedhassaanahmed/azure-event-driven-data-pipeline/master/nested-arm-templates/",
+        "consumerReceiveStorageAccountName": "[concat('receiver', uniqueString(resourceGroup().id))]",
+        "consumerReceiveStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('consumerReceiveStorageAccountName'))]",
+        "consumerReceiveServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerReceiveFunctionName'))]"
     },
     "resources": [
         {
@@ -186,7 +189,7 @@
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'sharedResources')]",
-                "[resourceId('Microsoft.Resources/deployments', 'consumerReceive')]"
+                "[resourceId('Microsoft.Web/Sites/sourcecontrols', parameters('consumerReceiveFunctionName'), 'web')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -214,22 +217,88 @@
             }
         },
         {
-            "apiVersion": "2018-09-01",
-            "name": "consumerReceive",
-            "type": "Microsoft.Resources/deployments",
+            "name": "[variables('consumerReceiveStorageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-07-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "name": "[parameters('consumerReceiveFunctionName')]",
+            "type": "Microsoft.Web/serverFarms",
+            "apiVersion": "2015-04-01",
+            "location": "[resourceGroup().location]",
             "properties": {
-                "mode": "incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('templatesBaseUri'), 'consumer-receive.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "consumerReceiveFunctionName": {
-                        "value": "[parameters('consumerReceiveFunctionName')]"
-                    },
-                    "repoURL": {
-                        "value": "[variables('repoURL')]"
+                "name": "[parameters('consumerReceiveFunctionName')]",
+                "computeMode": "Dynamic",
+                "sku": "Dynamic"
+            }
+        },
+        {
+            "name": "[parameters('consumerReceiveFunctionName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[variables('consumerReceiveServerFarmId')]",
+                "[variables('consumerReceiveStorageAccountId')]"
+            ],
+            "resources": [
+                {
+                    "name": "web",
+                    "type": "sourceControls",
+                    "apiVersion": "2018-02-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('consumerReceiveFunctionName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[variables('repoURL')]",
+                        "branch": "master",
+                        "IsManualIntegration": true
                     }
+                }
+            ],
+            "properties": {
+                "serverFarmId": "[variables('consumerReceiveServerFarmId')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerReceiveStorageAccountName'), ';AccountKey=', listKeys(variables('consumerReceiveStorageAccountId'),'2018-07-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerReceiveStorageAccountName'), ';AccountKey=', listKeys(variables('consumerReceiveStorageAccountId'),'2018-07-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "AzureWebJobsSecretStorageType",
+                            "value": "Files"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('consumerReceiveStorageAccountName'), ';AccountKey=', listKeys(variables('consumerReceiveStorageAccountId'),'2018-07-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "PROJECT",
+                            "value": "azure-functions/ConsumerReceiveFunc/ConsumerReceiveFunc.csproj"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[parameters('consumerReceiveFunctionName')]"
+                        },
+                        {
+                            "name": "SCM_COMMAND_IDLE_TIMEOUT",
+                            "value": "1200"
+                        }
+                    ]
                 }
             }
         }

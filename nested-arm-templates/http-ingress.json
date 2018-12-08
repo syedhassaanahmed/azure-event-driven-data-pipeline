@@ -23,7 +23,8 @@
     },
     "variables": {
         "httpIngressStorageAccountName": "[concat('http', uniqueString(resourceGroup().id))]",
-        "httpIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('httpIngressStorageAccountName'))]"
+        "httpIngressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('httpIngressStorageAccountName'))]",
+        "httpIngressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]"
     },
     "resources": [
         {
@@ -64,8 +65,8 @@
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('httpIngressStorageAccountName'))]",
+                "[variables('httpIngressServerFarmId')]",
+                "[variables('httpIngressStorageAccountId')]",
                 "[resourceId('microsoft.insights/components', parameters('httpIngressFunctionName'))]"
             ],
             "resources": [
@@ -85,7 +86,7 @@
             ],
             "properties": {
                 "name": "[parameters('httpIngressFunctionName')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('httpIngressFunctionName'))]",
+                "serverFarmId": "[variables('httpIngressServerFarmId')]",
                 "hostingEnvironment": "",
                 "clientAffinityEnabled": false,
                 "siteConfig": {

@@ -21,6 +21,7 @@
     "variables": {
         "consumerEgressStorageAccountName": "[concat('consumer', uniqueString(resourceGroup().id))]",
         "consumerEgressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('consumerEgressStorageAccountName'))]",
+        "consumerEgressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]",
         "consumerReceiveUrls": "[concat(parameters('consumerReceiveUrl'), '|', parameters('consumerReceiveUrl'), '|', parameters('consumerReceiveUrl'))]"
     },
     "resources": [
@@ -62,8 +63,8 @@
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('consumerEgressStorageAccountName'))]",
+                "[variables('consumerEgressServerFarmId')]",
+                "[variables('consumerEgressStorageAccountId')]",
                 "[resourceId('microsoft.insights/components', parameters('consumerEgressFunctionName'))]"
             ],
             "resources": [
@@ -82,7 +83,7 @@
                 }
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]",
+                "serverFarmId": "[variables('consumerEgressServerFarmId')]",
                 "siteConfig": {
                     "appSettings": [
                         {
