@@ -11,9 +11,6 @@
         "cosmosDbId": {
             "type": "string"
         },
-        "consumerReceiveUrl": {
-            "type": "string"
-        },
         "repoURL": {
             "type": "string"
         }
@@ -21,8 +18,7 @@
     "variables": {
         "consumerEgressStorageAccountName": "[concat('consumer', uniqueString(resourceGroup().id))]",
         "consumerEgressStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('consumerEgressStorageAccountName'))]",
-        "consumerEgressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]",
-        "consumerReceiveUrls": "[concat(parameters('consumerReceiveUrl'), '|', parameters('consumerReceiveUrl'), '|', parameters('consumerReceiveUrl'))]"
+        "consumerEgressServerFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('consumerEgressFunctionName'))]"
     },
     "resources": [
         {
@@ -120,7 +116,7 @@
                         },
                         {
                             "name": "CONSUMERS",
-                            "value": "[variables('consumerReceiveUrls')]"
+                            "value": "<PASTE CONSUMER-RECEIVE-FUNC URL MULTIPLE TIMES (PIPE-DELIMITED)>"
                         }
                     ]
                 }
