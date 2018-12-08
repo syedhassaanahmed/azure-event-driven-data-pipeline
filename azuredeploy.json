@@ -185,7 +185,8 @@
             "name": "consumerEgress",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'sharedResources')]"
+                "[resourceId('Microsoft.Resources/deployments', 'sharedResources')]",
+                "[resourceId('Microsoft.Resources/deployments', 'consumerReceive')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -202,6 +203,9 @@
                     },
                     "cosmosDbId": {
                         "value": "[variables('cosmosDbId')]"
+                    },
+                    "consumerReceiveUrl": {
+                        "value": "[listsecrets(resourceId('Microsoft.Web/sites/functions', parameters('consumerReceiveFunctionName'), 'ConsumerReceiveFunc'),'2018-02-01').trigger_url]"
                     },
                     "repoURL": {
                         "value": "[variables('repoURL')]"
@@ -229,11 +233,5 @@
                 }
             }
         }
-    ],
-    "outputs": {
-        "consumerReceiveKey": {
-            "type": "string",
-            "value": "[listsecrets(resourceId('Microsoft.Web/sites/functions', parameters('consumerReceiveFunctionName'), 'ConsumerReceiveFunc'),'2018-02-01').key]"
-        }        
-    }
+    ]
 }
