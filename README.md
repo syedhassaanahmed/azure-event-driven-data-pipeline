@@ -1,4 +1,5 @@
 # azure-event-driven-data-pipeline
+[![Build Status](https://dev.azure.com/syedhassaanahmed/azure-event-driven-data-pipeline/_apis/build/status/azure-event-driven-data-pipeline-CI)](https://dev.azure.com/syedhassaanahmed/azure-event-driven-data-pipeline/_build/latest?definitionId=9)
 
 ## Problem
 A large retailer with many source systems, wants a single source of truth of their data and be able to send updates to their consumers whenever this data is changed. They want to support an unpredictable load, with a max spike of 1500 req/sec.

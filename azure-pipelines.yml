@@ -5,4 +5,4 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
+- script: dotnet build azure-functions --configuration $(buildConfiguration)
