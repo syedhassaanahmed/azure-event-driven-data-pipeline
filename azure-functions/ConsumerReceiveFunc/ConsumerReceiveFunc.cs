@@ -20,7 +20,7 @@ namespace ConsumerReceiveFunc
             log.LogInformation(product);
 
             return new Random().Next(0, 10) < 6
-                ? (ActionResult)new OkObjectResult(product)
+                ? (ActionResult)new OkObjectResult("Product received")
                 : new BadRequestObjectResult("Random error");
         }
     }

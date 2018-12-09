@@ -23,7 +23,7 @@ Once the deployment is complete, the only **manual step** is to copy `ConsumerRe
 ## Running load tests
 We perform the load tests using [Azure Container Instances](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-overview). After creating resources using the above ARM template, run the following load testing script;
 ```
-./generate-load.sh <RESOURCE_GROUP> consumer-egress-func <CONTAINER_NAME> https://http-ingress-func.azurewebsites.net/api/HttpIngressFunc?code=<FUNCTION_KEY>
+./generate-load.sh <RESOURCE_GROUP> <CONTAINER_NAME> https://http-ingress-func.azurewebsites.net/api/HttpIngressFunc?code=<FUNCTION_KEY>
 ```
 
 Here is how to stream logs from the container;
