@@ -9,6 +9,46 @@
                 "description": "Name of the Http ingress function app."
             }
         },
+        "httpIngressSkuName": {
+            "type": "string",
+            "defaultValue": "S3",
+            "allowedValues": [
+                "F1",
+                "D1",
+                "B1",
+                "B2",
+                "B3",
+                "S1",
+                "S2",
+                "S3",
+                "P1",
+                "P2",
+                "P3",
+                "P4"
+            ],
+            "metadata": {
+                "description": "Pricing SKU of dedicated plan. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+            }
+        },
+        "httpIngressSkuTier": {
+            "type": "string",
+            "allowedValues": [
+                "Free",
+                "Shared",
+                "Basic",
+                "Standard"
+            ],
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "Pricing tier for dedicated plan."
+            }
+        },
+        "httpIngressSkuCapacity": {
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 20,
+            "defaultValue": 4
+        },
         "cosmosDbIngressFunctionName": {
             "type": "string",
             "defaultValue": "cosmosdb-ingress-func",
@@ -89,6 +129,15 @@
                 "parameters": {
                     "httpIngressFunctionName": {
                         "value": "[parameters('httpIngressFunctionName')]"
+                    },
+                    "httpIngressSkuName": {
+                        "value": "[parameters('httpIngressSkuName')]"
+                    },
+                    "httpIngressSkuTier": {
+                        "value": "[parameters('httpIngressSkuTier')]"
+                    },
+                    "httpIngressSkuCapacity": {
+                        "value": "[parameters('httpIngressSkuCapacity')]"
                     },
                     "serviceBusAuth": {
                         "value": "[variables('serviceBusAuth')]"

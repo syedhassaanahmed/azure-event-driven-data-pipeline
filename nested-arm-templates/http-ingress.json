@@ -5,6 +5,15 @@
         "httpIngressFunctionName": {
             "type": "string"
         },
+        "httpIngressSkuName": {
+            "type": "string"
+        },
+        "httpIngressSkuTier": {
+            "type": "string"
+        },
+        "httpIngressSkuCapacity": {
+            "type": "int"
+        },
         "serviceBusAuth": {
             "type": "string"
         },
@@ -41,12 +50,12 @@
         {
             "name": "[parameters('httpIngressFunctionName')]",
             "type": "Microsoft.Web/serverFarms",
-            "apiVersion": "2015-04-01",
+            "apiVersion": "2018-02-01",
             "location": "[resourceGroup().location]",
-            "properties": {
-                "name": "[parameters('httpIngressFunctionName')]",
-                "computeMode": "Dynamic",
-                "sku": "Dynamic"
+            "sku": {
+                "name": "[parameters('httpIngressSkuName')]",
+                "tier": "[parameters('httpIngressSkuTier')]",
+                "capacity": "[parameters('httpIngressSkuCapacity')]"
             }
         },
         {
@@ -76,15 +85,15 @@
                 }
             ],
             "properties": {
+                "name": "[parameters('httpIngressFunctionName')]",
                 "serverFarmId": "[variables('httpIngressServerFarmId')]",
+                "hostingEnvironment": "",
+                "clientAffinityEnabled": false,
                 "siteConfig": {
+                    "alwaysOn": true,
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2018-07-01').keys[0].value)]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('httpIngressStorageAccountName'), ';AccountKey=', listKeys(variables('httpIngressStorageAccountId'),'2018-07-01').keys[0].value)]"
                         },
                         {
@@ -98,10 +107,6 @@
                         {
                             "name": "PROJECT",
                             "value": "azure-functions/HttpIngressFunc/HttpIngressFunc.csproj"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[parameters('httpIngressFunctionName')]"
                         },
                         {
                             "name": "SERVICEBUS_CONNECTION",
