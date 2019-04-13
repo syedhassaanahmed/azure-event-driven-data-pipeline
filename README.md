@@ -33,12 +33,12 @@ az container attach -g <RESOURCE_GROUP> -n <CONTAINER_NAME>
 ```
 
 ## Measuring Cosmos DB RUs using Application Insights
-When we upsert into Cosmos DB, we log the [Request Units](https://docs.microsoft.com/en-us/azure/cosmos-db/request-units) consumed in [Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-overview). The following Application Insights analytics query renders a timechart of RUs consumed, aggregated on 10 seconds.
+When we upsert into Cosmos DB, we log the [Request Units](https://docs.microsoft.com/en-us/azure/cosmos-db/request-units) consumed in [Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-overview). The following [Kusto](https://docs.microsoft.com/en-us/azure/kusto/query/) query renders a timechart of RUs consumed in the last 10 minutes, aggregated on 10 seconds.
 ```sql
 customMetrics
-| where timestamp > datetime("2018-03-05T12:26:00")
+| where timestamp > ago(10m)
     and name == "product_RU"
-| summarize avg(value) by name, bin(timestamp, 10s)
+| summarize avg(value) by bin(timestamp, 10s)
 | render timechart
 ```
 
