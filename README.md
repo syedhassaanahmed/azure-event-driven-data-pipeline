@@ -4,13 +4,13 @@
 ## Problem
 A large retailer with many source systems, wants a single source of truth of their data and be able to send updates to their consumers whenever this data is changed. They want to support an unpredictable load, with a max spike of 1500 req/sec.
 
->[This blog post](https://medium.com/@hasssaaannn/building-single-source-of-truth-using-serverless-and-nosql-bca6c9d45eeb) describes the contents of this repo in detail.
+>[This blog post](https://syedhassaanahmed.github.io/2018/04/05/building-single-source-of-truth-using-serverless-and-nosql.html) describes the contents of this repo in detail.
 
 ## Architecture
 <div style=""><img src="docs/images/architecture.png"/></center></div>
 
 ## Deployment
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsyedhassaanahmed%2Fazure-event-driven-data-pipeline%2Fmaster%2Fazuredeploy.json)
 
 The entire deployment can be orchestrated using [ARM template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-create-first-template) `azuredeploy.json`.
 
