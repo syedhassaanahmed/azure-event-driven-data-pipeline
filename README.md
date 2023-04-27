@@ -4,8 +4,6 @@
 ## Problem
 A large retailer with many source systems, wants a single source of truth of their data and be able to send updates to their consumers whenever this data is changed. They want to support an unpredictable load, with a max spike of 1500 req/sec.
 
->[This blog post](https://syedhassaanahmed.github.io/2018/04/05/building-single-source-of-truth-using-serverless-and-nosql.html) describes the contents of this repo in detail.
-
 ## Architecture
 <div style=""><img src="docs/images/architecture.png"/></center></div>
 
